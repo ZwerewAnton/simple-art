@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
+using PrimeTween;
+using UI.Categories.CategoryScrollView;
 using UI.Common.ScrollView;
 using UnityEngine;
 
@@ -9,6 +12,7 @@ namespace UI.ScrollViews.CategoryScrollView
         [Header("Snap")] [SerializeField] [Range(0f, 20f)]
         protected float snapSpeed = 10f;
         [SerializeField] protected float snapThreshold = 0.5f;
+        [SerializeField] protected SelectionIndicator selectionIndicator;
         
         private Color _defaultColor = Color.black;
         private Color _highlightColor = Color.red;
@@ -17,6 +21,12 @@ namespace UI.ScrollViews.CategoryScrollView
         private bool _shouldSnap;
         private bool enableSnap;
 
+        public override void Initialize(List<CategoryItemModel> newModels)
+        {
+            base.Initialize(newModels);
+
+            selectionIndicator.SetIndicatorSize(ItemSize);
+        }
         protected override float CalculateItemSize(RectTransform rect)
         {
             var rectHeight = rect.rect.height;
@@ -65,6 +75,8 @@ namespace UI.ScrollViews.CategoryScrollView
 
             _targetItemData = new TargetItemData(item.RectTransform.anchoredPosition, item.ItemIndex);
             MarkToUpdate();
+            
+            selectionIndicator.MoveSelectionIndicator(itemIndex * (ItemSize + itemSpacing));
             
             _shouldSnap = true;
         }

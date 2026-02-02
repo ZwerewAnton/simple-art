@@ -98,6 +98,22 @@ namespace UI.Common.ScrollView
                 ? new Vector2(size, content.sizeDelta.y)
                 : new Vector2(content.sizeDelta.x, size);
         }
+        
+        protected virtual void SetupItemRectTransform(RectTransform rect)
+        {
+            if (scrollRect.horizontal)
+            {
+                rect.anchorMin = new Vector2(0f, 0.5f);
+                rect.anchorMax = new Vector2(0f, 0.5f);
+                rect.pivot = new Vector2(0f, 0.5f);
+            }
+            else
+            {
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+            }
+        }
 
         #endregion
 
@@ -111,6 +127,7 @@ namespace UI.Common.ScrollView
             {
                 var go = Instantiate(itemPrefab, content);
                 var item = go.GetComponent<TItem>();
+                SetupItemRectTransform(item.RectTransform);
                 item.Clicked += OnItemClicked;
                 ActiveItems.Add(item);
             }
