@@ -162,7 +162,7 @@ namespace UI.Common.ScrollView
             Models.Clear();
             Models.AddRange(models);
 
-            MarkToUpdate();
+            //MarkToUpdate();
         }
 
         protected virtual void UpdateScroll()

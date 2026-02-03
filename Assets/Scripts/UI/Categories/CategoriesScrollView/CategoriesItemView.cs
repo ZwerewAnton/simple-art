@@ -8,9 +8,16 @@ namespace UI.Categories.CategoriesScrollView
     {
         [SerializeField] private PicturesScrollPresenter scrollPresenter;
 
-        public void Initialize(CategoriesItemModel model)
+        public void Initialize()
         {
-            scrollPresenter.Initialize(model.pictureItemModels);
+            scrollPresenter.Initialize();
+        }
+
+        public override void SetData(int itemIndex, CategoriesItemModel model)
+        {
+            base.SetData(itemIndex, model);
+            
+            scrollPresenter.UpdateModels(model.pictureItemModels);
         }
     }
 }

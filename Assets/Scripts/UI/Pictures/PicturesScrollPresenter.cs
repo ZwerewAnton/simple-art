@@ -12,6 +12,25 @@ namespace UI.Pictures
         [SerializeField] protected float cellSpacing = 40f;
         [SerializeField] protected float horizontalPadding = 60f;
 
+        public void Initialize()
+        {
+            if (Initialized)
+                ClearPool();
+
+            Initialized = true;
+
+            Models.Clear();
+
+            var itemRect = itemPrefab.GetComponent<RectTransform>();
+            ItemSize = CalculateItemSize(itemRect);
+            BorderSpacing = GetBorderSpacing();
+            
+            var cellSize = ItemSize + itemSpacing;
+            ViewItemCount = CalculateViewItemCount(cellSize);
+
+            CreatePool();
+        }
+        
         public void Initialize(List<PictureItemModel> models)
         {
             base.Initialize(BuildRows(models));
@@ -31,7 +50,18 @@ namespace UI.Pictures
                 gridItemView.Initialize(itemsPerRow,  pictureCellSize, cellSpacing, horizontalPadding);
             }
         }
-        
+
+        public void UpdateModels(List<PictureItemModel> models)
+        {
+            base.UpdateModels(BuildRows(models));
+            
+            SetContentSize();
+            var cellSize = ItemSize + itemSpacing;
+            ViewItemCount = CalculateViewItemCount(cellSize);
+            
+            UpdateVisibleItems();
+        }
+
         private List<PictureItemModel[]> BuildRows(List<PictureItemModel> models)
         {
             var rows = new List<PictureItemModel[]>();
