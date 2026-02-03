@@ -13,7 +13,8 @@ namespace UI.Common.ScrollView
         [SerializeField] protected RectTransform content;
         [SerializeField] protected GameObject itemPrefab;
 
-        [Header("Items")] [Range(0f, 500f)] [SerializeField] protected float itemSpacing = 50f;
+        [Header("Items")] 
+        [Range(0f, 500f)] [SerializeField] protected float itemSpacing = 50f;
         [Range(0f, 500f)] [SerializeField] protected float borderSpacing = 50f;
         [Range(0f, 10f)] [SerializeField] protected int additionalPoolItemsCount = 2;
         
@@ -22,7 +23,7 @@ namespace UI.Common.ScrollView
         protected float BorderSpacing;
         protected bool Initialized;
         protected float ItemSize;
-        protected int VisibleItemCount;
+        protected int ViewItemCount;
         
         private bool _markToUpdate;
 
@@ -85,7 +86,7 @@ namespace UI.Common.ScrollView
 
             SetContentSize();
             var cellSize = ItemSize + itemSpacing;
-            VisibleItemCount = Mathf.Min(Models.Count, Mathf.CeilToInt(GetViewportSize() / cellSize)) + additionalPoolItemsCount;
+            ViewItemCount = CalculateViewItemCount(cellSize);
 
             CreatePool();
             UpdateVisibleItems();
@@ -97,6 +98,11 @@ namespace UI.Common.ScrollView
             content.sizeDelta = scrollRect.horizontal
                 ? new Vector2(size, content.sizeDelta.y)
                 : new Vector2(content.sizeDelta.x, size);
+        }
+
+        protected virtual int CalculateViewItemCount(float cellSize)
+        {
+            return Mathf.Min(Models.Count, Mathf.CeilToInt(GetViewportSize() / cellSize)) + additionalPoolItemsCount;
         }
         
         protected virtual void SetupItemRectTransform(RectTransform rect)
@@ -123,7 +129,7 @@ namespace UI.Common.ScrollView
         {
             ClearPool();
 
-            for (var i = 0; i < VisibleItemCount; i++)
+            for (var i = 0; i < ViewItemCount; i++)
             {
                 var go = Instantiate(itemPrefab, content);
                 var item = go.GetComponent<TItem>();
@@ -178,17 +184,21 @@ namespace UI.Common.ScrollView
             if (!Initialized)
                 return;
 
-            var offset = GetItemsOffset();
+            var offset = GetScrollOffset();
             var cellSize = ItemSize + itemSpacing;
-            var firstVisibleIndex = Mathf.FloorToInt(offset / cellSize);
+            var firstVisibleIndex = Mathf.FloorToInt((offset - borderSpacing) / cellSize);
             firstVisibleIndex = Mathf.Max(0, firstVisibleIndex);
 
+            var viewportSize = GetViewportSize();
+            var lastVisibleIndex =
+                Mathf.CeilToInt((offset - borderSpacing - cellSize + viewportSize) / cellSize);
+            
             for (var i = 0; i < ActiveItems.Count; i++)
             {
                 var modelIndex = firstVisibleIndex + i;
                 var item = ActiveItems[i];
 
-                if (modelIndex < 0 || modelIndex >= Models.Count)
+                if (modelIndex < firstVisibleIndex || modelIndex > lastVisibleIndex || modelIndex >= Models.Count)
                 {
                     item.gameObject.SetActive(false);
                     continue;
