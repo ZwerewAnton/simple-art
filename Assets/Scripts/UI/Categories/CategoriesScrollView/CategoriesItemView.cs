@@ -13,11 +13,17 @@ namespace UI.Categories.CategoriesScrollView
             scrollPresenter.Initialize();
         }
 
+        public Vector2 GetContentPosition()
+        {
+            return scrollPresenter.GetContentPosition();
+        }
+
         public override void SetData(int itemIndex, CategoriesItemModel model)
         {
             base.SetData(itemIndex, model);
             
             scrollPresenter.UpdateModels(model.pictureItemModels);
+            scrollPresenter.SetContentPosition(model.contentPosition);
         }
     }
 }

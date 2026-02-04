@@ -11,6 +11,8 @@ namespace UI.Common.ScrollView
         public int ItemIndex { get; set; }
 
         public RectTransform RectTransform => rectTransform;
+        
+        public bool Active => gameObject.activeSelf;
 
         public void OnPointerClick(PointerEventData eventData)
         {
@@ -22,6 +24,16 @@ namespace UI.Common.ScrollView
         public virtual void SetData(int itemIndex, TModel model)
         {
             ItemIndex = itemIndex;
+        }
+
+        public void SetAnchoredPosition(Vector2 position)
+        {
+            rectTransform.anchoredPosition = position;
+        }
+
+        public void SetActive(bool active)
+        {
+            gameObject.SetActive(active);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UI.ScrollViews.CategoryScrollView
+namespace UI.ScrollViews
 {
     public struct TargetItemData
     {

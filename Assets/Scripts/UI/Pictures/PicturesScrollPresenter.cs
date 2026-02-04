@@ -106,6 +106,16 @@ namespace UI.Pictures
             
             UpdateVisibleItems();
         }
+        
+        public Vector2 GetContentPosition()
+        {
+            return scrollRect.content.anchoredPosition;
+        }
+
+        public void SetContentPosition(Vector2 position)
+        {
+            scrollRect.content.anchoredPosition = position;
+        }
 
         private List<PictureItemModel[]> BuildRows(List<PictureItemModel> models)
         {
@@ -128,12 +138,15 @@ namespace UI.Pictures
         private void BlockScroll()
         {
             scrollRect.velocity = Vector2.zero;
+            scrollRect.inertia = false;
             scrollRect.vertical = false;
         }
 
         private void UnblockScroll()
         {
+            scrollRect.velocity = Vector2.zero;
             scrollRect.vertical = true;
+            scrollRect.inertia = true;
         }
     }
 }

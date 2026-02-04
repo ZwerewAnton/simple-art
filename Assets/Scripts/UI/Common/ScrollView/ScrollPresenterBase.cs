@@ -200,15 +200,15 @@ namespace UI.Common.ScrollView
 
                 if (modelIndex < firstVisibleIndex || modelIndex > lastVisibleIndex || modelIndex >= Models.Count)
                 {
-                    item.gameObject.SetActive(false);
+                    item.SetActive(false);
                     continue;
                 }
 
                 if (!item.gameObject.activeSelf)
-                    item.gameObject.SetActive(true);
+                    item.SetActive(true);
 
                 item.SetData(modelIndex, Models[modelIndex]);
-                item.RectTransform.anchoredPosition = GetAnchoredPosition(modelIndex);
+                item.SetAnchoredPosition(GetAnchoredPosition(modelIndex));
             }
         }
 
