@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UI.Categories.CategoriesScrollView;
+using UI.Categories.CategoryScrollView;
 using UI.Pictures;
 using UI.ScrollViews.CategoryScrollView;
 using UnityEngine;

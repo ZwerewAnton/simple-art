@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UI.Common.ScrollView;
+using UI.ScrollViews;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using Zenject;
 
 namespace UI.Pictures
 {
@@ -11,6 +15,26 @@ namespace UI.Pictures
         [SerializeField] protected float pictureCellSize = 640f;
         [SerializeField] protected float cellSpacing = 40f;
         [SerializeField] protected float horizontalPadding = 60f;
+
+        private NestedScrollCoordinator _coordinator;
+
+        [Inject]
+        private void Construct(NestedScrollCoordinator scrollCoordinator)
+        {
+            _coordinator = scrollCoordinator;
+        }
+
+        protected void Start()
+        {
+            _coordinator.NestedScrollBlocked += BlockScroll;
+            _coordinator.NestedScrollUnblocked += UnblockScroll;
+        }
+
+        protected override void OnDestroy()
+        {
+            _coordinator.NestedScrollBlocked -= BlockScroll;
+            _coordinator.NestedScrollUnblocked -= UnblockScroll;
+        }
 
         public void Initialize()
         {
@@ -51,6 +75,27 @@ namespace UI.Pictures
             }
         }
 
+        public override void OnBeginDrag(PointerEventData eventData)
+        {
+            base.OnBeginDrag(eventData);
+            
+            _coordinator.OnNestedBeginDrag(eventData);
+        }
+
+        public override void OnDrag(PointerEventData eventData)
+        {
+            base.OnDrag(eventData);
+            
+            _coordinator.OnNestedDrag(eventData);
+        }
+
+        public override void OnEndDrag(PointerEventData eventData)
+        {
+            base.OnDrag(eventData);
+            
+            _coordinator.OnNestedEndDrag(eventData);
+        }
+
         public void UpdateModels(List<PictureItemModel> models)
         {
             base.UpdateModels(BuildRows(models));
@@ -78,6 +123,17 @@ namespace UI.Pictures
             }
 
             return rows;
+        }
+
+        private void BlockScroll()
+        {
+            scrollRect.velocity = Vector2.zero;
+            scrollRect.vertical = false;
+        }
+
+        private void UnblockScroll()
+        {
+            scrollRect.vertical = true;
         }
     }
 }

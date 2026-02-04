@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using PrimeTween;
-using UI.Categories.CategoryScrollView;
 using UI.Common.ScrollView;
+using UI.ScrollViews.CategoryScrollView;
 using UnityEngine;
 
-namespace UI.ScrollViews.CategoryScrollView
+namespace UI.Categories.CategoryScrollView
 {
     public class CategoryScrollPresenter : ScrollPresenterBase<CategoryItemModel, CategoryItemView>
     {
