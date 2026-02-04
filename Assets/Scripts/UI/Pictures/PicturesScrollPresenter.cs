@@ -24,24 +24,28 @@ namespace UI.Pictures
             _coordinator = scrollCoordinator;
         }
 
-        protected void Start()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+            
             _coordinator.NestedScrollBlocked += BlockScroll;
             _coordinator.NestedScrollUnblocked += UnblockScroll;
         }
 
-        protected override void OnDestroy()
+        protected override void OnDisable()
         {
+            base.OnDisable();
+            
             _coordinator.NestedScrollBlocked -= BlockScroll;
             _coordinator.NestedScrollUnblocked -= UnblockScroll;
         }
 
         public void Initialize()
         {
-            if (Initialized)
+            if (IsInitialized)
                 ClearPool();
 
-            Initialized = true;
+            IsInitialized = true;
 
             Models.Clear();
 

@@ -23,6 +23,7 @@ namespace UI.ScrollViews
         {
             _startPosition = eventData.position;
             _currentMode = ScrollInputMode.None;
+            NestedScrollBlocked?.Invoke();
         }
         
         public void OnNestedDrag(PointerEventData eventData)
@@ -33,10 +34,12 @@ namespace UI.ScrollViews
                 
                 if (_currentMode == ScrollInputMode.Horizontal)
                 {
-                    NestedScrollBlocked?.Invoke();
-                    
                     categoriesScrollPresenter.OnBeginDrag(eventData);
                     scrollRect.OnBeginDrag(eventData);
+                }
+                if (_currentMode == ScrollInputMode.Vertical)
+                {
+                    NestedScrollUnblocked?.Invoke();
                 }
             }
             

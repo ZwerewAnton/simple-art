@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using UI.Common.ScrollView;
 using UI.ScrollViews;
@@ -12,21 +12,29 @@ namespace UI.Categories.CategoryScrollView
         [Header("Snap")] [SerializeField] [Range(0f, 20f)]
         protected float snapSpeed = 10f;
         [SerializeField] protected float snapThreshold = 0.5f;
-        [SerializeField] protected SelectionIndicator selectionIndicator;
+        
+        public event Action<int> ItemClicked;
         
         private Color _defaultColor = Color.black;
         private Color _highlightColor = Color.red;
         
         private TargetItemData _targetItemData;
         private bool _shouldSnap;
-        private bool enableSnap;
+        private bool _enableSnap;
 
-        public override void Initialize(List<CategoryItemModel> newModels)
+        public void SelectModel(int index)
         {
-            base.Initialize(newModels);
-
-            selectionIndicator.SetIndicatorSize(ItemSize);
+            if (index < 0 && index >= Models.Count)
+                return;
+            
+            for (var i = 0; i < Models.Count; i++)
+            {
+                Models[i].isSelected = index == i;
+            }
+            
+            MarkToUpdate();
         }
+        
         protected override float CalculateItemSize(RectTransform rect)
         {
             var rectHeight = rect.rect.height;
@@ -34,7 +42,7 @@ namespace UI.Categories.CategoryScrollView
             var viewportSize = GetViewportSize();
             if (Mathf.CeilToInt(viewportSize / cellSize) > Models.Count)
             {
-                enableSnap = false;
+                _enableSnap = false;
                 return viewportSize / Models.Count;
             }
             
@@ -53,7 +61,7 @@ namespace UI.Categories.CategoryScrollView
         
         protected void LateUpdate()
         {
-            if (_shouldSnap && enableSnap)
+            if (_shouldSnap && _enableSnap)
                 SmoothSnap();
         }
         
@@ -63,6 +71,8 @@ namespace UI.Categories.CategoryScrollView
             
             if (itemIndex >= Models.Count)
                 return;
+            
+            ItemClicked?.Invoke(itemIndex);
 
             for (var index = 0; index < Models.Count; index++)
             {
@@ -76,7 +86,7 @@ namespace UI.Categories.CategoryScrollView
             _targetItemData = new TargetItemData(item.RectTransform.anchoredPosition, item.ItemIndex);
             MarkToUpdate();
             
-            selectionIndicator.MoveSelectionIndicator(itemIndex * (ItemSize + itemSpacing));
+            //selectionIndicator.MoveSelectionIndicator(itemIndex * (ItemSize + itemSpacing));
             
             _shouldSnap = true;
         }

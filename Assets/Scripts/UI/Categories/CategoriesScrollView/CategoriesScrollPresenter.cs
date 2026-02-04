@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UI.Common.ScrollView;
 using UI.ScrollViews;
@@ -14,13 +15,15 @@ namespace UI.Categories.CategoriesScrollView
         protected float snapSpeed = 10f;
         [SerializeField] 
         protected float snapThreshold = 0.5f;
+
+        public event Action<int> CenteredViewChanged;
         
         private DiContainer _diContainer;
         
         private float _lastDragDirection;
         private bool _shouldSnap;
-
         private TargetItemData _targetItemData;
+        private int lastCenteredItemIndex;
         
         [Inject]
         public void Construct(DiContainer diContainer)
@@ -77,7 +80,24 @@ namespace UI.Categories.CategoriesScrollView
             _targetItemData = FindNearestItemData();
             _shouldSnap = true;
         }
+
+        protected override void OnScrollChanged(Vector2 _)
+        {
+            base.OnScrollChanged(_);
+
+            FindNearestItemIndex();
+        }
         
+        public void MoveToItem(int index)
+        {
+            if (index < 0 && index >= Models.Count)
+                return;
+            
+            _shouldSnap = true;
+            _targetItemData = new TargetItemData(GetAnchoredPosition(index), index);
+            SaveViewsPosition();
+        }
+
         private void SmoothSnap()
         {
             var currentX = content.anchoredPosition.x;
@@ -91,6 +111,34 @@ namespace UI.Categories.CategoriesScrollView
                 content.anchoredPosition = new Vector2(targetX, content.anchoredPosition.y);
                 _shouldSnap = false;
             }
+        }
+
+        private int FindNearestItemIndex()
+        {
+            var center = -content.anchoredPosition.x;
+            var closestDist = float.MaxValue;
+            var closestModelIndex = 0;
+            
+            foreach (var item in ActiveItems)
+            {
+                var itemCenter = item.RectTransform.anchoredPosition.x - BorderSpacing;
+                var distance = center - itemCenter;
+
+                var absDist = Mathf.Abs(distance);
+                if (absDist < closestDist)
+                {
+                    closestDist = absDist;
+                    closestModelIndex = item.ItemIndex;
+                }
+            }
+
+            if (lastCenteredItemIndex != closestModelIndex)
+            {
+                CenteredViewChanged?.Invoke(closestModelIndex);
+                lastCenteredItemIndex = closestModelIndex;
+            }
+
+            return closestModelIndex;
         }
 
         private TargetItemData FindNearestItemData()

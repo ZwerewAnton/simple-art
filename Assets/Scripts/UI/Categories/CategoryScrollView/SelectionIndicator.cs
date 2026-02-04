@@ -6,26 +6,41 @@ namespace UI.Categories.CategoryScrollView
     public class SelectionIndicator : MonoBehaviour
     {
         [SerializeField] private RectTransform rectTransform;
+        [SerializeField] private RectTransform indicatorRectTransform;
         [SerializeField] private float indicatorTweenDuration = 0.4f;
         
         private Tween _indicatorTween;
-        
-        public void MoveSelectionIndicator(float position)
+        private int _elementsCount;
+        private float _elementLength;
+
+        public void Setup(float size, int elementsCount)
         {
+            SetIndicatorSize(size);
+            _elementsCount = elementsCount;
+            _elementLength = rectTransform.rect.width / _elementsCount;
+        }
+
+        public void MoveByIndex(int elementsIndex)
+        {
+            if (elementsIndex < 0 || elementsIndex >= _elementsCount)
+                return;
+            
             if (_indicatorTween.isAlive)
                 _indicatorTween.Stop();
 
+            var position = elementsIndex * _elementLength;
+
             _indicatorTween = Tween.UIAnchoredPosition(
-                rectTransform,
-                new Vector2(position, rectTransform.anchoredPosition.y),
+                indicatorRectTransform,
+                new Vector2(position, indicatorRectTransform.anchoredPosition.y),
                 indicatorTweenDuration,
                 Ease.OutCubic
             );
         }
 
-        public void SetIndicatorSize(float size)
+        private void SetIndicatorSize(float size)
         {
-            rectTransform.SetSizeWithCurrentAnchors(
+            indicatorRectTransform.SetSizeWithCurrentAnchors(
                 RectTransform.Axis.Horizontal,
                 size
             );

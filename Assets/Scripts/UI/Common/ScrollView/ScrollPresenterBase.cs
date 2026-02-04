@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,12 +18,16 @@ namespace UI.Common.ScrollView
         [Range(0f, 500f)] [SerializeField] protected float itemSpacing = 50f;
         [Range(0f, 500f)] [SerializeField] protected float borderSpacing = 50f;
         [Range(0f, 10f)] [SerializeField] protected int additionalPoolItemsCount = 2;
+
+        public event Action Initialized;
+        public float ItemSize { get; protected set; }
+        public int ModelsCount => Models.Count;
         
         protected readonly List<TItem> ActiveItems = new();
         protected readonly List<TModel> Models = new();
         protected float BorderSpacing;
-        protected bool Initialized;
-        protected float ItemSize;
+        protected bool IsInitialized;
+
         protected int ViewItemCount;
         
         private bool _markToUpdate;
@@ -72,10 +77,10 @@ namespace UI.Common.ScrollView
             if (newModels == null || newModels.Count == 0)
                 return;
 
-            if (Initialized)
+            if (IsInitialized)
                 ClearPool();
 
-            Initialized = true;
+            IsInitialized = true;
 
             Models.Clear();
             Models.AddRange(newModels);
@@ -89,6 +94,9 @@ namespace UI.Common.ScrollView
             ViewItemCount = CalculateViewItemCount(cellSize);
 
             CreatePool();
+            
+            Initialized?.Invoke();
+            
             UpdateVisibleItems();
         }
 
@@ -181,7 +189,7 @@ namespace UI.Common.ScrollView
 
         protected virtual void UpdateVisibleItems()
         {
-            if (!Initialized)
+            if (!IsInitialized)
                 return;
 
             var offset = GetScrollOffset();
