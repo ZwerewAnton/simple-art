@@ -21,21 +21,18 @@ namespace Remote
                 return;
             }
 
-            // есть в кеше → сразу возвращаем
             if (_cache.TryGetValue(url, out var cached))
             {
                 onComplete?.Invoke(cached);
                 return;
             }
 
-            // есть уже загрузка → добавляем callback
             if (_pendingCallbacks.TryGetValue(url, out var callbacks))
             {
                 callbacks.Add(onComplete);
                 return;
             }
 
-            // новая загрузка
             _pendingCallbacks[url] = new List<Action<Texture2D>> { onComplete };
             LoadInternal(url).Forget();
         }
@@ -43,6 +40,8 @@ namespace Remote
         private async UniTaskVoid LoadInternal(string url)
         {
             using var request = UnityWebRequestTexture.GetTexture(url, false);
+            request.timeout = 10;
+            
             await request.SendWebRequest().ToUniTask();
 
             Texture2D tex = null;
@@ -53,7 +52,7 @@ namespace Remote
             }
             else
             {
-                Debug.LogWarning($"Image load failed: {url} | {request.error}");
+                Debug.LogWarning($"Image load failed: {url} with {request.error}");
             }
 
             if (_pendingCallbacks.TryGetValue(url, out var callbacks))
@@ -65,7 +64,7 @@ namespace Remote
             }
         }
 
-        public void ClearCache()
+        private void ClearCache()
         {
             foreach (var tex in _cache.Values)
                 Object.Destroy(tex);
