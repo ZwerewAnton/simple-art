@@ -22,6 +22,11 @@ namespace UI.Banners
         [SerializeField] private bool snap;
         [SerializeField] private float snapSpeed = 10f;
         [SerializeField] protected float snapThreshold = 0.5f;
+        
+        [Header("Auto Scroll")]
+        [SerializeField] private bool autoScroll = true;
+        [SerializeField] private float autoScrollDelay = 5f;
+
 
         public event Action<int> FocusItemChanged;
         public event Action Initialized;
@@ -44,6 +49,7 @@ namespace UI.Banners
         protected TargetItemData TargetItemData;
         protected bool ShouldSnap;
         private float LastDragDirection;
+        private float _autoScrollTimer;
         
         protected virtual void OnEnable()
         {
@@ -69,6 +75,20 @@ namespace UI.Banners
             Initialized?.Invoke();
         }
 
+        private void Update()
+        {
+            if (!autoScroll || _dragging || ShouldSnap)
+                return;
+
+            _autoScrollTimer += Time.deltaTime;
+
+            if (_autoScrollTimer >= autoScrollDelay)
+            {
+                _autoScrollTimer = 0f;
+                AutoScrollNext();
+            }
+        }
+
         protected void LateUpdate()
         {
             if (snap && ShouldSnap)
@@ -84,12 +104,16 @@ namespace UI.Banners
         public void OnBeginDrag(PointerEventData eventData)
         {
             _dragging = true;
+            _autoScrollTimer = 0f;
+            
             DisableSnap();
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
             _dragging = false;
+            _autoScrollTimer = 0f;
+            
             if (snap)
             {
                 LastDragDirection = Mathf.Sign(eventData.position.x - eventData.pressPosition.x);
@@ -180,6 +204,18 @@ namespace UI.Banners
         private int Next(int index)
         {
             return (index + 1) % _items.Count;
+        }
+        
+        private void AutoScrollNext()
+        {
+            LastDragDirection = -1f;
+            TargetItemData = new TargetItemData
+            {
+                ItemIndex = _nextIndex,
+                AnchoredPosition = _items[_nextIndex].anchoredPosition
+            };
+
+            EnableSnap();
         }
         
         protected virtual void SmoothSnap()
