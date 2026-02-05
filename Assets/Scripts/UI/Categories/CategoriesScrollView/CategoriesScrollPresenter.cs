@@ -34,6 +34,12 @@ namespace UI.Categories.CategoriesScrollView
             }
         }
 
+        protected override void SetupItemRectTransform(RectTransform rect)
+        {
+            base.SetupItemRectTransform(rect);
+            rect.sizeDelta = new Vector2(ItemSize, scrollRect.viewport.rect.height);
+        }
+
         protected override float CalculateItemSize(RectTransform rect)
         {
             return GetViewportSize();
@@ -45,14 +51,27 @@ namespace UI.Categories.CategoriesScrollView
 
             SaveViewsPosition();
         }
+
+        public override void OnEndDrag(PointerEventData eventData)
+        {
+            base.OnEndDrag(eventData);
+
+            SaveViewsPosition();
+        }
+
         
+        protected override void OnSnapEnded()
+        {
+            SaveViewsPosition();
+        }
+
         protected override void OnScrollChanged(Vector2 _)
         {
             base.OnScrollChanged(_);
 
             CheckCenteredViewChanging();
         }
-        
+
         public void MoveToItem(int index)
         {
             if (index < 0 && index >= Models.Count)
@@ -97,6 +116,10 @@ namespace UI.Categories.CategoriesScrollView
                     continue;
                 
                 var index = item.ItemIndex;
+                
+                if (index < 0)
+                    continue;
+                
                 Models[index].contentPosition = item.GetContentPosition();
             }
         }

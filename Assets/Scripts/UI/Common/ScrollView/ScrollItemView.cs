@@ -8,7 +8,8 @@ namespace UI.Common.ScrollView
     public abstract class ScrollItemView<TModel> : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private RectTransform rectTransform;
-        public int ItemIndex { get; set; }
+        public int ItemIndex { get; set; } = -1;
+        public bool isRefreshed = false;
 
         public RectTransform RectTransform => rectTransform;
         
@@ -24,6 +25,7 @@ namespace UI.Common.ScrollView
         public virtual void SetData(int itemIndex, TModel model)
         {
             ItemIndex = itemIndex;
+            isRefreshed = true;
         }
 
         public void SetAnchoredPosition(Vector2 position)
@@ -33,7 +35,11 @@ namespace UI.Common.ScrollView
 
         public void SetActive(bool active)
         {
+            if (gameObject.activeSelf == active) 
+                return;
+            
             gameObject.SetActive(active);
+            isRefreshed = false;
         }
     }
 }

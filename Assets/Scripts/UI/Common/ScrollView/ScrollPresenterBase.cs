@@ -34,7 +34,7 @@ namespace UI.Common.ScrollView
         protected bool IsInitialized;
         protected int ViewItemCount;
         private float LastDragDirection;
-                
+        
         protected TargetItemData TargetItemData;
         protected bool ShouldSnap;
         
@@ -233,10 +233,13 @@ namespace UI.Common.ScrollView
                     continue;
                 }
 
-                if (!item.gameObject.activeSelf)
-                    item.SetActive(true);
+                item.SetActive(true);
 
-                item.SetData(modelIndex, Models[modelIndex]);
+                if (item.ItemIndex != modelIndex || !item.isRefreshed)
+                {
+                    item.SetData(modelIndex, Models[modelIndex]);
+                }
+
                 item.SetAnchoredPosition(GetAnchoredPosition(modelIndex));
             }
         }
@@ -285,6 +288,18 @@ namespace UI.Common.ScrollView
             return GetScrollOffset() - cellSize;
         }
 
+        protected virtual void OnItemDeactivate(TItem item)
+        {
+        }
+
+        protected void MarkViewsToRefresh()
+        {
+            foreach (var itemView in ActiveItems)
+            {
+                itemView.isRefreshed = false;
+            }
+        }
+
         protected void MarkToUpdate()
         {
             _markToUpdate = true;
@@ -294,13 +309,13 @@ namespace UI.Common.ScrollView
 
         #region Animation
 
-        protected void DisableSnap()
+        protected virtual void DisableSnap()
         {
             ShouldSnap = false;
             scrollRect.inertia = true;
         }
 
-        protected void EnableSnap()
+        protected virtual void EnableSnap()
         {
             scrollRect.inertia = false;
             ShouldSnap = true;
@@ -318,7 +333,13 @@ namespace UI.Common.ScrollView
             {
                 content.anchoredPosition = new Vector2(targetX, content.anchoredPosition.y);
                 ShouldSnap = false;
+                OnSnapEnded();
             }
+        }
+
+        protected virtual void OnSnapEnded()
+        {
+            
         }
         
         protected virtual TargetItemData FindNearestItemData()

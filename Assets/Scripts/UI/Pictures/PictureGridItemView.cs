@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UI.Common.ScrollView;
 using UnityEngine;
+using Zenject;
 
 namespace UI.Pictures
 {
@@ -8,8 +9,16 @@ namespace UI.Pictures
     {
         [SerializeField] private PictureCell cellPrefab;
 
+        private DiContainer _diContainer;
+        
         private readonly List<PictureCell> _cells = new();
 
+        [Inject]
+        private void Construct(DiContainer diContainer)
+        {
+            _diContainer = diContainer;
+        }
+        
         public void Initialize(
             int itemsPerRow,
             float cellSize,
@@ -28,7 +37,14 @@ namespace UI.Pictures
             for (var i = 0; i < _cells.Count; i++)
             {
                 var cell = _cells[i];
-                cell.SetActive(i < modelCount);
+                if (i >= modelCount)
+                {
+                    cell.SetActive(false);
+                    continue;
+                }
+
+                cell.SetActive(true);
+                cell.SetImage(model[i].ImageUrl);
             }
         }
 
@@ -36,7 +52,8 @@ namespace UI.Pictures
         {
             while (_cells.Count < count)
             {
-                var cell = Instantiate(cellPrefab, RectTransform);
+                var go = _diContainer.InstantiatePrefab(cellPrefab, RectTransform);
+                var cell = go.GetComponent<PictureCell>();
                 cell.SetSize(cellSize);
                 _cells.Add(cell);
             }

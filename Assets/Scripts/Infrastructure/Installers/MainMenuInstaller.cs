@@ -1,4 +1,4 @@
-using UI;
+using Remote;
 using UI.ScrollViews;
 using UnityEngine;
 using Zenject;
@@ -12,6 +12,12 @@ namespace Infrastructure.Installers
         public override void InstallBindings()
         {
             BindNestedScrollCoordinator();
+            BindImageLoader();
+        }
+
+        private void BindImageLoader()
+        {
+            Container.Bind<ILoader>().To<ImageLoader>().AsSingle();
         }
 
         private void BindNestedScrollCoordinator()

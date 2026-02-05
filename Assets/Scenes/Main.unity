@@ -230,7 +230,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &437207437
 RectTransform:
   m_ObjectHideFlags: 0
@@ -457,7 +457,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1440, y: 3040}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0.85
+  m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -501,9 +501,8 @@ RectTransform:
   - {fileID: 1642255497}
   - {fileID: 437207437}
   - {fileID: 425524706103047414}
-  - {fileID: 820898185}
   - {fileID: 1271968059}
-  - {fileID: 2121118815}
+  - {fileID: 820898185}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -729,6 +728,82 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1321698534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1321698535}
+  - component: {fileID: 1321698537}
+  - component: {fileID: 1321698536}
+  m_Layer: 5
+  m_Name: BannerDots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1321698535
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321698534}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1642255497}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 21}
+  m_SizeDelta: {x: 1440, y: 25}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &1321698536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321698534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 14
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &1321698537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321698534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aeb9588225964ec2a1ded02bbf8775e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dotPrefab: {fileID: 6127065688712004056, guid: 4423faacd4a394d49bf0a11546a1dd5b, type: 3}
 --- !u!1 &1354364980
 GameObject:
   m_ObjectHideFlags: 0
@@ -927,7 +1002,7 @@ GameObject:
   - component: {fileID: 1642255499}
   - component: {fileID: 1642255498}
   m_Layer: 5
-  m_Name: BannerZone
+  m_Name: BannerPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -946,6 +1021,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1751640848}
+  - {fileID: 1321698535}
   m_Father: {fileID: 717728546}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -1081,11 +1157,14 @@ MonoBehaviour:
   scrollRect: {fileID: 1751640850}
   viewport: {fileID: 241370459}
   content: {fileID: 1710714540}
+  layoutGroup: {fileID: 0}
   bannerPrefabs:
   - {fileID: 3413049443095568318, guid: 27f0c4305c4eb234385719073b399d67, type: 3}
   - {fileID: 7595391722840244282, guid: 4cfc7206acbdc9a43abb268fc405c560, type: 3}
   - {fileID: 2019890525287301359, guid: 8e51ced5fdb3ace4e92e160c5577aeda, type: 3}
+  snap: 1
   snapSpeed: 10
+  snapThreshold: 0.5
 --- !u!114 &1751640850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1340,25 +1419,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &2121118815
-RectTransform:
+--- !u!4 &2121118815
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2121118814}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 717728546}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2121118816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1374,6 +1449,8 @@ MonoBehaviour:
   categoriesScrollPresenter: {fileID: 9212402506307289354}
   categoryScrollPresenter: {fileID: 437207440}
   selectionIndicator: {fileID: 5911251583906811762}
+  bannerScrollPresenter: {fileID: 1751640849}
+  dotPresenter: {fileID: 1321698537}
 --- !u!1 &2136605880
 GameObject:
   m_ObjectHideFlags: 0
@@ -1514,10 +1591,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3309158275283626149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1440, y: 2204}
+  m_SizeDelta: {x: 1440, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &5892159735422324258
 MonoBehaviour:
@@ -1563,7 +1640,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_Pivot.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1571,7 +1648,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_AnchorMin.x
@@ -1579,7 +1656,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_SizeDelta.x
@@ -1623,7 +1700,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 683
+      value: -832
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1643,7 +1720,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8487124093808531695, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1767,7 +1844,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &9212402506307289353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1814,3 +1891,4 @@ SceneRoots:
   - {fileID: 717728546}
   - {fileID: 1960388086}
   - {fileID: 1284219683}
+  - {fileID: 2121118815}

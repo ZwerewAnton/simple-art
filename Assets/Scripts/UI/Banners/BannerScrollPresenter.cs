@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UI.Common.ScrollView;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,76 +13,118 @@ namespace UI.Banners
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] private RectTransform viewport;
         [SerializeField] private RectTransform content;
+        [SerializeField] private HorizontalLayoutGroup layoutGroup;
 
         [Header("Items")]
         [SerializeField] private List<GameObject> bannerPrefabs;
 
         [Header("Settings")]
+        [SerializeField] private bool snap;
         [SerializeField] private float snapSpeed = 10f;
+        [SerializeField] protected float snapThreshold = 0.5f;
+
+        public event Action<int> FocusItemChanged;
+        public event Action Initialized;
+        public int ItemsCount => _items.Count;
+        public int FocusItemIndex => _centerIndex;
 
         private List<RectTransform> _items = new();
-        private float _itemSize;
-        private int _centerIndex = 0;
-        private bool _dragging = false;
 
+        private float _itemSize;
+        private float _center;
+        private float _threshold = 50f;
+        private bool _dragging = false;
+        private float _lastShiftX;
+        private int _lastCenterBannerIndex;
+        
+        private int _nextIndex;
+        private int _prevIndex;
+        private int _centerIndex;
+        
+        protected TargetItemData TargetItemData;
+        protected bool ShouldSnap;
+        private float LastDragDirection;
+        
+        protected virtual void OnEnable()
+        {
+            if (scrollRect != null)
+                scrollRect.onValueChanged.AddListener(OnScrollChanged);
+        }
+        
         private void Start()
+        {
+            Initialize();
+        }
+
+        private void Initialize()
         {
             _itemSize = viewport.rect.width;
             SpawnBanners();
             LayoutItems();
+            
+            _centerIndex = 0;
+            _prevIndex = Prev(_centerIndex);
+            _nextIndex = Next(_centerIndex);
+            
+            Initialized?.Invoke();
         }
 
-        private void Update()
+        protected void LateUpdate()
         {
-            if (_items.Count == 0) return;
-
-            // 1. Перестановка элементов во время drag
-            if (_dragging)
-            {
-                HandleDragShift();
-            }
-
-            // 2. Перемещение content и snap после остановки
-            if (!_dragging && scrollRect.velocity.sqrMagnitude < 5f)
-            {
-                HandleStopped();
-            }
+            if (snap && ShouldSnap)
+                SmoothSnap();
         }
-
-        private void SpawnBanners()
+        
+        private void OnDisable()
         {
-            foreach (Transform child in content)
-                Destroy(child.gameObject);
-
-            _items.Clear();
-
-            foreach (var prefab in bannerPrefabs)
-            {
-                var go = Instantiate(prefab, content);
-                var rect = go.GetComponent<RectTransform>();
-                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-                rect.pivot = new Vector2(0.5f, 0.5f);
-                rect.sizeDelta = new Vector2(_itemSize, rect.sizeDelta.y);
-
-                _items.Add(rect);
-            }
+            if (scrollRect != null)
+                scrollRect.onValueChanged.RemoveListener(OnScrollChanged);
         }
 
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            _dragging = true;
+            DisableSnap();
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            _dragging = false;
+            if (snap)
+            {
+                LastDragDirection = Mathf.Sign(eventData.position.x - eventData.pressPosition.x);
+                TargetItemData = FindNearestItemData();
+                EnableSnap();
+            }
+        }
+        
+        private void MoveCenter()
+        {
+            content.anchoredPosition = Vector2.zero;
+            scrollRect.velocity = Vector2.zero;
+            _lastShiftX = 0f;
+
+            LayoutItems();
+        }
+        
         private void LayoutItems()
         {
-            int count = _items.Count;
+            var count = _items.Count;
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                int relativeIndex = GetRelativeIndex(i, _centerIndex, count);
-                float x = relativeIndex * _itemSize;
+                var relativeIndex = GetRelativeIndex(i, _centerIndex, count);
+                var x = relativeIndex * _itemSize;
+
                 _items[i].anchoredPosition = new Vector2(x, 0f);
             }
-        }
 
-        private int GetRelativeIndex(int itemIndex, int centerIndex, int count)
+            content.anchoredPosition = Vector2.zero;
+        }
+        
+        private static int GetRelativeIndex(int itemIndex, int centerIndex, int count)
         {
-            int diff = itemIndex - centerIndex;
+            var diff = itemIndex - centerIndex;
 
             if (diff > count / 2)
                 diff -= count;
@@ -89,61 +133,131 @@ namespace UI.Banners
 
             return diff;
         }
-
-        private void HandleDragShift()
+        
+        private void OnScrollChanged(Vector2 _)
         {
-            // Проверяем каждый элемент
-            float halfItem = _itemSize / 2f;
-            int count = _items.Count;
+            var currentX = content.anchoredPosition.x;
+            var delta = currentX - _lastShiftX;
+            
+            var threshold = _itemSize * 0.5f;
 
-            for (int i = 0; i < count; i++)
+            if (delta <= -threshold)
             {
-                // Позиция элемента относительно центра viewport
-                float localX = _items[i].localPosition.x + content.anchoredPosition.x;
+                var centerItemPosition = _items[_nextIndex].anchoredPosition.x;
+                var newBannerPosition =  _itemSize + centerItemPosition;
+                _items[_prevIndex].anchoredPosition = new Vector2(newBannerPosition, 0f);
+                
+                _centerIndex = _nextIndex;
+                _nextIndex = Next(_centerIndex);
+                _prevIndex = Prev(_centerIndex);
+                
+                _lastShiftX -= _itemSize;
+                
+                FocusItemChanged?.Invoke(_centerIndex);
+            }
+            else if (delta >= threshold)
+            {
+                var centerX = _items[_prevIndex].anchoredPosition.x;
+                var newX = centerX - _itemSize;
 
-                if (localX < -_itemSize) // ушёл влево
-                {
-                    _items[i].anchoredPosition += new Vector2(_itemSize * count, 0f);
-                }
-                else if (localX > _itemSize) // ушёл вправо
-                {
-                    _items[i].anchoredPosition -= new Vector2(_itemSize * count, 0f);
-                }
+                _items[_nextIndex].anchoredPosition = new Vector2(newX, 0f);
+
+                _centerIndex = _prevIndex;
+                _nextIndex = Next(_centerIndex);
+                _prevIndex = Prev(_centerIndex);
+                
+                _lastShiftX += _itemSize;
+                
+                FocusItemChanged?.Invoke(_centerIndex);
             }
         }
 
-        private void HandleStopped()
+        private int Prev(int index)
         {
-            float x = content.anchoredPosition.x;
+            return (index - 1 + _items.Count) % _items.Count;
+        }
+        
+        private int Next(int index)
+        {
+            return (index + 1) % _items.Count;
+        }
+        
+        protected virtual void SmoothSnap()
+        {
+            var currentX = content.anchoredPosition.x;
+            var targetX = -TargetItemData.AnchoredPosition.x;
 
-            if (Mathf.Abs(x) < _itemSize * 0.5f)
-                return; // остаёмся на том же элементе
+            var newX = Mathf.Lerp(currentX, targetX, snapSpeed * Time.deltaTime);
+            content.anchoredPosition = new Vector2(newX, content.anchoredPosition.y);
 
-            int direction = x > 0 ? -1 : 1;
+            if (Mathf.Abs(newX - targetX) < snapThreshold)
+            {
+                content.anchoredPosition = new Vector2(targetX, content.anchoredPosition.y);
+                ShouldSnap = false;
+                FocusItemChanged?.Invoke(_centerIndex);
+                MoveCenter();
+            }
+        }
+        
+        private TargetItemData FindNearestItemData()
+        {
+            var center = -content.anchoredPosition.x;
+            var closestDist = float.MaxValue;
+            var closestByDirectionDist = float.MaxValue;
+            var closest = new TargetItemData();
+            var closestByDirection = new TargetItemData();
 
-            MoveCenter(direction);
+            for (var i = 0; i < _items.Count; i++)
+            {
+                var item = _items[i];
+                var itemCenter = item.anchoredPosition.x;
+                var distance = center - itemCenter;
+
+                var validByDirection =
+                    Mathf.Approximately(LastDragDirection, 0f) ||
+                    (LastDragDirection > 0 && distance >= 0f) ||
+                    (LastDragDirection < 0 && distance <= 0f);
+
+
+                var absDist = Mathf.Abs(distance);
+                if (absDist < closestDist)
+                {
+                    closestDist = absDist;
+                    closest.AnchoredPosition = item.anchoredPosition;
+                    closest.ItemIndex = i;
+                }
+
+                if (validByDirection && absDist < closestByDirectionDist)
+                {
+                    closestByDirectionDist = absDist;
+                    closestByDirection.AnchoredPosition = item.anchoredPosition;
+                    closestByDirection.ItemIndex = i;
+                }
+            }
+
+            return closestByDirectionDist < float.MaxValue ? closestByDirection : closest;
         }
 
-        private void MoveCenter(int direction)
+        private void SpawnBanners()
         {
-            int count = _items.Count;
-            _centerIndex = (_centerIndex + direction + count) % count;
-
-            // Сбрасываем смещение content
-            content.anchoredPosition = Vector2.zero;
-            scrollRect.velocity = Vector2.zero;
-
-            LayoutItems();
+            for (var i = 0; i < bannerPrefabs.Count; i++)
+            {
+                var go = Instantiate(bannerPrefabs[i], content);
+                var itemRect = go.GetComponent<RectTransform>();
+                _items.Add(itemRect);
+            }
+        }
+        
+        private void DisableSnap()
+        {
+            ShouldSnap = false;
+            scrollRect.inertia = true;
         }
 
-        public void OnBeginDrag(PointerEventData eventData)
+        private void EnableSnap()
         {
-            _dragging = true;
-        }
-
-        public void OnEndDrag(PointerEventData eventData)
-        {
-            _dragging = false;
+            scrollRect.inertia = false;
+            ShouldSnap = true;
         }
     }
 }

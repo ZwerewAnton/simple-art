@@ -9,9 +9,6 @@ namespace UI.Categories.CategoryScrollView
     public class CategoryScrollPresenter : ScrollPresenterBase<CategoryItemModel, CategoryItemView>
     {
         public event Action<int> ItemClicked;
-        
-        private Color _defaultColor = Color.black;
-        private Color _highlightColor = Color.red;
 
         public void SelectModel(int index)
         {
@@ -22,7 +19,8 @@ namespace UI.Categories.CategoryScrollView
             {
                 Models[i].isSelected = index == i;
             }
-            
+
+            MarkViewsToRefresh();
             MarkToUpdate();
         }
         
@@ -69,8 +67,6 @@ namespace UI.Categories.CategoryScrollView
 
             TargetItemData = new TargetItemData(item.RectTransform.anchoredPosition, item.ItemIndex);
             MarkToUpdate();
-            
-            //selectionIndicator.MoveSelectionIndicator(itemIndex * (ItemSize + itemSpacing));
             
             ShouldSnap = true;
         }

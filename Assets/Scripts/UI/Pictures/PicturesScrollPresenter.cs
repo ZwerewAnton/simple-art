@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UI.Common.ScrollView;
 using UI.ScrollViews;
@@ -17,11 +16,13 @@ namespace UI.Pictures
         [SerializeField] protected float horizontalPadding = 60f;
 
         private NestedScrollCoordinator _coordinator;
+        private DiContainer _diContainer;
 
         [Inject]
-        private void Construct(NestedScrollCoordinator scrollCoordinator)
+        private void Construct(NestedScrollCoordinator scrollCoordinator,  DiContainer diContainer)
         {
             _coordinator = scrollCoordinator;
+            _diContainer = diContainer;
         }
 
         protected override void OnEnable()
@@ -71,8 +72,17 @@ namespace UI.Pictures
         
         protected override void CreatePool()
         {
-            base.CreatePool();
+            ClearPool();
 
+            for (var i = 0; i < ViewItemCount; i++)
+            {
+                var go = _diContainer.InstantiatePrefab(itemPrefab, content);
+                var item = go.GetComponent<PictureGridItemView>();
+                SetupItemRectTransform(item.RectTransform);
+                item.Clicked += OnItemClicked;
+                ActiveItems.Add(item);
+            }
+            
             foreach (var gridItemView in ActiveItems)
             {
                 gridItemView.Initialize(itemsPerRow,  pictureCellSize, cellSpacing, horizontalPadding);

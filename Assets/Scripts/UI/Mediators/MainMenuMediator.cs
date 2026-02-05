@@ -1,26 +1,34 @@
+using UI.Banners;
+using UI.Banners.Dots;
 using UI.Categories.CategoriesScrollView;
 using UI.Categories.CategoryScrollView;
 using UnityEngine;
 
-namespace UI.Categories
+namespace UI.Mediators
 {
-    public class CategoriesScrollCoordinator : MonoBehaviour
+    public class MainMenuMediator : MonoBehaviour
     {
         [SerializeField] private CategoriesScrollPresenter categoriesScrollPresenter;
         [SerializeField] private CategoryScrollPresenter categoryScrollPresenter;
         [SerializeField] private SelectionIndicator selectionIndicator;
+        [SerializeField] private BannerScrollPresenter bannerScrollPresenter;
+        [SerializeField] private DotPresenter dotPresenter;
 
         private void OnEnable()
         {
             categoryScrollPresenter.Initialized += OnCategoryScrollInitialized;
             categoriesScrollPresenter.CenteredViewChanged += OnCategoriesScrollCenteredItemChanged;
             categoryScrollPresenter.ItemClicked += OnCategoryItemClicked;
+            bannerScrollPresenter.Initialized += OnBannerScrollInitialized;
+            bannerScrollPresenter.FocusItemChanged += OnBannerFocusItemChanged;
         }
 
         private void OnDisable()
         {
             categoriesScrollPresenter.CenteredViewChanged -= OnCategoriesScrollCenteredItemChanged;
             categoryScrollPresenter.ItemClicked -= OnCategoryItemClicked;
+            bannerScrollPresenter.Initialized -= OnBannerScrollInitialized;
+            bannerScrollPresenter.FocusItemChanged -= OnBannerFocusItemChanged;
         }
 
         private void OnCategoriesScrollCenteredItemChanged(int index)
@@ -37,5 +45,11 @@ namespace UI.Categories
         
         private void OnCategoryScrollInitialized() 
             => selectionIndicator.Setup(categoryScrollPresenter.ItemSize, categoryScrollPresenter.ModelsCount);
+
+        private void OnBannerScrollInitialized() 
+            => dotPresenter.SpawnDots(bannerScrollPresenter.ItemsCount, bannerScrollPresenter.FocusItemIndex);
+        
+        private void OnBannerFocusItemChanged(int index) 
+            => dotPresenter.SetDotActive(index);
     }
 }
