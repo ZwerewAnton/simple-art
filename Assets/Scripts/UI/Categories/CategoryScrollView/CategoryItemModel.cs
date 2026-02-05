@@ -1,6 +1,6 @@
 using System;
 
-namespace UI.ScrollViews.CategoryScrollView
+namespace UI.Categories.CategoryScrollView
 {
     [Serializable]
     public class CategoryItemModel

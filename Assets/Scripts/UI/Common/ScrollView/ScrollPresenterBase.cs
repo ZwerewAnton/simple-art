@@ -19,6 +19,11 @@ namespace UI.Common.ScrollView
         [Range(0f, 500f)] [SerializeField] protected float borderSpacing = 50f;
         [Range(0f, 10f)] [SerializeField] protected int additionalPoolItemsCount = 2;
 
+        [Header("Snap")] 
+        [SerializeField] protected bool snap;
+        [SerializeField] [Range(0f, 20f)] protected float snapSpeed = 10f;
+        [SerializeField] protected float snapThreshold = 0.5f;
+        
         public event Action Initialized;
         public float ItemSize { get; protected set; }
         public int ModelsCount => Models.Count;
@@ -27,8 +32,11 @@ namespace UI.Common.ScrollView
         protected readonly List<TModel> Models = new();
         protected float BorderSpacing;
         protected bool IsInitialized;
-
         protected int ViewItemCount;
+        private float LastDragDirection;
+                
+        protected TargetItemData TargetItemData;
+        protected bool ShouldSnap;
         
         private bool _markToUpdate;
 
@@ -44,6 +52,12 @@ namespace UI.Common.ScrollView
         {
             UpdateScroll();
         }
+        
+        protected void LateUpdate()
+        {
+            if (snap && ShouldSnap)
+                SmoothSnap();
+        }
 
         protected virtual void OnDisable()
         {
@@ -58,10 +72,17 @@ namespace UI.Common.ScrollView
 
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
+            DisableSnap();
         }
 
         public virtual void OnEndDrag(PointerEventData eventData)
         {
+            if (snap)
+            {
+                LastDragDirection = Mathf.Sign(eventData.position.x - eventData.pressPosition.x);
+                TargetItemData = FindNearestItemData();
+                EnableSnap();
+            }
         }
 
         public virtual void OnDrag(PointerEventData eventData)
@@ -267,6 +288,75 @@ namespace UI.Common.ScrollView
         protected void MarkToUpdate()
         {
             _markToUpdate = true;
+        }
+
+        #endregion
+
+        #region Animation
+
+        protected void DisableSnap()
+        {
+            ShouldSnap = false;
+            scrollRect.inertia = true;
+        }
+
+        protected void EnableSnap()
+        {
+            scrollRect.inertia = false;
+            ShouldSnap = true;
+        }
+
+        protected virtual void SmoothSnap()
+        {
+            var currentX = content.anchoredPosition.x;
+            var targetX = -TargetItemData.AnchoredPosition.x + BorderSpacing;
+
+            var newX = Mathf.Lerp(currentX, targetX, snapSpeed * Time.deltaTime);
+            content.anchoredPosition = new Vector2(newX, content.anchoredPosition.y);
+
+            if (Mathf.Abs(newX - targetX) < snapThreshold)
+            {
+                content.anchoredPosition = new Vector2(targetX, content.anchoredPosition.y);
+                ShouldSnap = false;
+            }
+        }
+        
+        protected virtual TargetItemData FindNearestItemData()
+        {
+            var center = -content.anchoredPosition.x;
+            var closestDist = float.MaxValue;
+            var closestByDirectionDist = float.MaxValue;
+            var closest = new TargetItemData();
+            var closestByDirection = new TargetItemData();
+
+            foreach (var item in ActiveItems)
+            {
+                var itemCenter = item.RectTransform.anchoredPosition.x - BorderSpacing;
+                var distance = center - itemCenter;
+
+                var validByDirection =
+                    Mathf.Approximately(LastDragDirection, 0f) ||
+                    (LastDragDirection > 0 && distance >= 0f) ||
+                    (LastDragDirection < 0 && distance <= 0f);
+
+
+                var absDist = Mathf.Abs(distance);
+                if (absDist < closestDist)
+                {
+                    closestDist = absDist;
+                    closest.AnchoredPosition = item.RectTransform.anchoredPosition;
+                    closest.ItemIndex = item.ItemIndex;
+                }
+
+                if (validByDirection && absDist < closestByDirectionDist)
+                {
+                    closestByDirectionDist = absDist;
+                    closestByDirection.AnchoredPosition = item.RectTransform.anchoredPosition;
+                    closestByDirection.ItemIndex = item.ItemIndex;
+                }
+            }
+
+            return closestByDirectionDist < float.MaxValue ? closestByDirection : closest;
         }
 
         #endregion

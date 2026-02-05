@@ -1,5 +1,6 @@
 using PrimeTween;
 using TMPro;
+using UI.Categories.CategoryScrollView;
 using UI.Common.ScrollView;
 using UnityEngine;
 using UnityEngine.UI;
