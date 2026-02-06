@@ -1371,6 +1371,7 @@ GameObject:
   - component: {fileID: 425706625}
   - component: {fileID: 425706624}
   - component: {fileID: 425706628}
+  - component: {fileID: 425706629}
   m_Layer: 5
   m_Name: ImageViewerCanvas
   m_TagString: Untagged
@@ -1412,7 +1413,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1440, y: 3040}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -1475,6 +1476,23 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &425706629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 425706623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079dfc1b10f14657b029f553cc1e89da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  closeButton: {fileID: 1354353241}
+  rectTransform: {fileID: 425706627}
+  canvasGroup: {fileID: 425706628}
+  rawImage: {fileID: 1599065243}
+  animationDuration: 0.5
 --- !u!1 &437207436
 GameObject:
   m_ObjectHideFlags: 0
@@ -3738,10 +3756,10 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -3756,7 +3774,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 1035098952}
+  m_TargetGraphic: {fileID: 1297583268}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -7477,6 +7495,7 @@ MonoBehaviour:
   closeButton: {fileID: 412328863}
   roll: {fileID: 179079463}
   mask: {fileID: 380470566}
+  animationDuration: 0.5
   rollStartPosition: {x: 0, y: 502}
   rollEndPosition: {x: 0, y: -2980}
   maskOnHeight: 3040
@@ -7620,6 +7639,8 @@ MonoBehaviour:
   selectionIndicator: {fileID: 5911251583906811762}
   bannerScrollPresenter: {fileID: 1751640849}
   dotPresenter: {fileID: 1321698537}
+  premiumDialog: {fileID: 2050141065}
+  imageDialog: {fileID: 425706629}
 --- !u!1 &2136605880
 GameObject:
   m_ObjectHideFlags: 0

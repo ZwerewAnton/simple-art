@@ -52,7 +52,7 @@ namespace UI.Categories.CategoriesScrollView
             SaveViewsPosition();
             foreach (var itemView in ActiveItems)
             {
-                itemView.isRefreshed = false;
+                itemView.IsRefreshed = false;
             }
         }
 

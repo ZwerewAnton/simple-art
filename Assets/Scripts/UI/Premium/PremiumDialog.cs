@@ -6,9 +6,10 @@ namespace UI.Premium
 {
     public class PremiumDialog : CloseDialog
     {
-        [Header("CloseAnimation")]
         [SerializeField] private RectTransform roll;
         [SerializeField] private RectTransform mask;
+        [Header("Animation")]
+        [SerializeField] private float animationDuration = 0.5f;
         [SerializeField] private Vector2 rollStartPosition = new (0f, 502f);
         [SerializeField] private Vector2 rollEndPosition = new (0f, -2980);
         [SerializeField] private float maskOnHeight = 3040f;
@@ -39,7 +40,7 @@ namespace UI.Premium
                     roll,
                     rollStartPosition,
                     rollEndPosition,
-                    1f,
+                    animationDuration,
                     Ease.InOutSine
                 )
             );
@@ -48,11 +49,10 @@ namespace UI.Premium
                     mask,
                     new Vector2(mask.sizeDelta.x, maskOffHeight),
                     new Vector2(mask.sizeDelta.x, maskOnHeight),
-                    1f,
+                    animationDuration,
                     Ease.InOutSine
                 )
             );
-            _animationSequence.OnComplete(() => gameObject.SetActive(false));
         }
         
         private void AnimateClosing()
@@ -67,7 +67,7 @@ namespace UI.Premium
                     roll,
                     rollEndPosition,
                     rollStartPosition,
-                    1f,
+                    animationDuration,
                     Ease.InOutSine
                 )
             );
@@ -76,7 +76,7 @@ namespace UI.Premium
                     mask,
                     new Vector2(mask.sizeDelta.x, maskOnHeight),
                     new Vector2(mask.sizeDelta.x, maskOffHeight),
-                    1f,
+                    animationDuration,
                     Ease.InOutSine
                 )
             );

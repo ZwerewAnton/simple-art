@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using Remote;
 using UI.Banners;
 using UI.Banners.Dots;
 using UI.Categories.CategoriesScrollView;
 using UI.Categories.CategoryScrollView;
+using UI.Premium;
 using UnityEngine;
+using Zenject;
 
 namespace UI.Mediators
 {
@@ -14,6 +17,16 @@ namespace UI.Mediators
         [SerializeField] private SelectionIndicator selectionIndicator;
         [SerializeField] private BannerScrollPresenter bannerScrollPresenter;
         [SerializeField] private DotPresenter dotPresenter;
+        [SerializeField] private PremiumDialog premiumDialog;
+        [SerializeField] private ImageDialog.ImageDialog imageDialog;
+
+        private ILoader _imageLoader;
+
+        [Inject]
+        private void Construct(ILoader imageLoader)
+        {
+            _imageLoader = imageLoader;
+        }
 
         private void OnEnable()
         {
@@ -37,6 +50,15 @@ namespace UI.Mediators
         
         public void InitializeCategories(List<CategoriesItemModel> categoriesItemModels) 
             => categoriesScrollPresenter.Initialize(categoriesItemModels);
+        
+        public void ShowImageDialog(string url)
+        {
+            var result = _imageLoader.HasImage(url, out var image);
+            if (result)
+                imageDialog.Show(image);
+        }
+        
+        public void ShowPremiumDialog() => premiumDialog.Show();
 
         private void OnCategoriesScrollCenteredItemChanged(int index)
         {

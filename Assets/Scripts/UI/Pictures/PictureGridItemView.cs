@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UI.Common.ScrollView;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace UI.Pictures
     public class PictureGridItemView : ScrollItemView<PictureItemModel[]>
     {
         [SerializeField] private PictureCell cellPrefab;
+        public event Action<int, int> CellClicked;
 
         private DiContainer _diContainer;
         
@@ -25,6 +27,7 @@ namespace UI.Pictures
             float cellSpacing,
             float horizontalPadding)
         {
+            SetSize(cellSize);
             CreateCells(itemsPerRow, cellSize);
             LayoutCells(cellSize, cellSpacing, horizontalPadding);
         }
@@ -46,8 +49,7 @@ namespace UI.Pictures
                 var cellModel = model[i];
 
                 cell.SetActive(true);
-                cell.SetBadge(cellModel.IsPremium);
-                cell.SetImage(cellModel.ImageUrl);
+                cell.SetData(i, cellModel.IsPremium, cellModel.ImageUrl);
             }
         }
 
@@ -59,7 +61,13 @@ namespace UI.Pictures
                 var cell = go.GetComponent<PictureCell>();
                 cell.SetSize(cellSize);
                 _cells.Add(cell);
+                cell.Clicked += OnCellClicked;
             }
+        }
+
+        private void OnCellClicked(int cellItemIndex)
+        {
+            CellClicked?.Invoke(ItemIndex, cellItemIndex);
         }
         
         private void LayoutCells(
@@ -82,6 +90,19 @@ namespace UI.Pictures
             {
                 var x = startX + i * (cellSize + cellSpacing);
                 _cells[i].SetPosition(new Vector2(x, 0f));
+            }
+        }
+        
+        private void SetSize(float size)
+        {
+            RectTransform.sizeDelta = new Vector2(RectTransform.sizeDelta.x, size);
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var cell in _cells)
+            {
+                cell.Clicked -= OnCellClicked;
             }
         }
     }

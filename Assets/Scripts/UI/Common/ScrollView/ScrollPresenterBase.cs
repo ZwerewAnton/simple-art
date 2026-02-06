@@ -235,7 +235,7 @@ namespace UI.Common.ScrollView
 
                 item.SetActive(true);
 
-                if (item.ItemIndex != modelIndex || !item.isRefreshed)
+                if (item.ItemIndex != modelIndex || !item.IsRefreshed)
                 {
                     item.SetData(modelIndex, Models[modelIndex]);
                 }
@@ -296,7 +296,7 @@ namespace UI.Common.ScrollView
         {
             foreach (var itemView in ActiveItems)
             {
-                itemView.isRefreshed = false;
+                itemView.IsRefreshed = false;
             }
         }
 

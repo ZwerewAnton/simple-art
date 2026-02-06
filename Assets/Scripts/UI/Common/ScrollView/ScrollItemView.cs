@@ -9,7 +9,7 @@ namespace UI.Common.ScrollView
     {
         [SerializeField] private RectTransform rectTransform;
         public int ItemIndex { get; set; } = -1;
-        public bool isRefreshed;
+        public bool IsRefreshed { get; set; }
 
         public RectTransform RectTransform => rectTransform;
         
@@ -38,7 +38,7 @@ namespace UI.Common.ScrollView
                 return;
             
             gameObject.SetActive(active);
-            isRefreshed = false;
+            IsRefreshed = false;
         }
     }
 }

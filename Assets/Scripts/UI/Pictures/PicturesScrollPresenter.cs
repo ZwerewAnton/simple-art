@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using UI.Common.ScrollView;
+using UI.Mediators;
 using UI.ScrollViews;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,18 +13,21 @@ namespace UI.Pictures
     {
         [Header("Grid")] 
         [Range(2, 3)] [SerializeField] protected int itemsPerRow = 2;
-        [SerializeField] protected float pictureCellSize = 640f;
+        [SerializeField] protected float picture2CellSize = 640f;
+        [SerializeField] protected float picture3CellSize = 413f;
         [SerializeField] protected float cellSpacing = 40f;
         [SerializeField] protected float horizontalPadding = 60f;
 
         private NestedScrollCoordinator _coordinator;
         private DiContainer _diContainer;
+        private MainMenuMediator _mainMenuMediator;
 
         [Inject]
-        private void Construct(NestedScrollCoordinator scrollCoordinator,  DiContainer diContainer)
+        private void Construct(NestedScrollCoordinator scrollCoordinator,  DiContainer diContainer, MainMenuMediator mainMenuMediator)
         {
             _coordinator = scrollCoordinator;
             _diContainer = diContainer;
+            _mainMenuMediator = mainMenuMediator;
         }
 
         protected override void OnEnable()
@@ -64,7 +69,12 @@ namespace UI.Pictures
         {
             base.Initialize(BuildRows(models));
         }
-        
+
+        protected override float CalculateItemSize(RectTransform rect)
+        {
+            return itemsPerRow == 3 ? picture3CellSize : picture2CellSize;
+        }
+
         protected override int CalculateViewItemCount(float cellSize)
         {
             return Mathf.CeilToInt(GetViewportSize() / cellSize) + additionalPoolItemsCount;
@@ -79,13 +89,23 @@ namespace UI.Pictures
                 var go = _diContainer.InstantiatePrefab(itemPrefab, content);
                 var item = go.GetComponent<PictureGridItemView>();
                 SetupItemRectTransform(item.RectTransform);
-                item.Clicked += OnItemClicked;
+                item.CellClicked += OnCellItemClicked;
                 ActiveItems.Add(item);
             }
             
             foreach (var gridItemView in ActiveItems)
             {
-                gridItemView.Initialize(itemsPerRow,  pictureCellSize, cellSpacing, horizontalPadding);
+                gridItemView.Initialize(itemsPerRow,  ItemSize, cellSpacing, horizontalPadding);
+            }
+        }
+
+        protected override void ClearPool()
+        {
+            base.ClearPool();
+
+            foreach (var gridItemView in ActiveItems)
+            {
+                gridItemView.CellClicked -= OnCellItemClicked;
             }
         }
 
@@ -129,6 +149,30 @@ namespace UI.Pictures
         public void SetContentPosition(Vector2 position)
         {
             scrollRect.content.anchoredPosition = position;
+        }
+
+        private void OnCellItemClicked(int itemIndex, int cellItemIndex)
+        {
+            base.OnItemClicked(itemIndex);
+            
+            var item = ActiveItems.FirstOrDefault(i => i.ItemIndex == itemIndex);
+            if (item == null)
+                return;
+
+            var index = item.ItemIndex;
+            if (index < 0 || index >= Models.Count || cellItemIndex  < 0 || cellItemIndex >= itemsPerRow)
+                return;
+            
+            var model = Models[index][cellItemIndex];
+
+            if (model.IsPremium)
+            {
+                _mainMenuMediator.ShowPremiumDialog();
+            }
+            else
+            {
+                _mainMenuMediator.ShowImageDialog(model.ImageUrl);
+            }
         }
 
         private List<PictureItemModel[]> BuildRows(List<PictureItemModel> models)

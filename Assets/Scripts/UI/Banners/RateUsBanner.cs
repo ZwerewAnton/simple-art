@@ -1,6 +1,7 @@
 using Coffee.UIExtensions;
 using PrimeTween;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UI.Banners
 {
@@ -13,7 +14,7 @@ namespace UI.Banners
         [SerializeField] private RectTransform button;
         [SerializeField] private RectTransform bigStar;
         [SerializeField] private RectTransform smallStar;
-        [SerializeField] private UIParticle particleSystem;
+        [SerializeField] private UIParticle uiParticle;
         
         [Header("Lights")]
         [SerializeField] private float lightScaleDelta = 0.08f;
@@ -42,7 +43,7 @@ namespace UI.Banners
         {
             StopAnimation();
 
-            particleSystem.Play();
+            uiParticle.Play();
             AnimateLights();
             AnimateRays();
             AnimateFrame();
@@ -64,7 +65,7 @@ namespace UI.Banners
                 _bigStarTween.Stop();
             if (_buttonRotateTween.isAlive)
                 _buttonRotateTween.Stop();
-            particleSystem.Stop();
+            uiParticle.Stop();
         }
 
         private void AnimateStars()

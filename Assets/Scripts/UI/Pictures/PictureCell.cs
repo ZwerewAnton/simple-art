@@ -1,21 +1,25 @@
+using System;
 using PrimeTween;
 using Remote;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
 namespace UI.Pictures
 {
-    public class PictureCell :  MonoBehaviour
+    public class PictureCell :  MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private RectTransform rectTransform;
         [SerializeField] private Image loading;
         [SerializeField] private Image badge;
         [SerializeField] private RawImage image;
+        public event Action<int> Clicked;
 
         private ILoader _imageLoader;
         private string _currentUrl;
         private int _requestId;
+        private int _itemIndex = -1;
         
         private Tween _loadingTween;
 
@@ -38,6 +42,13 @@ namespace UI.Pictures
         public void SetActive(bool active)
         {
             gameObject.SetActive(active);
+        }
+
+        public void SetData(int index, bool isBadge, string url)
+        {
+            _itemIndex = index;
+            SetBadge(isBadge);
+            SetImage(url);
         }
 
         public void SetBadge(bool active)
@@ -120,6 +131,11 @@ namespace UI.Pictures
         private void OnDisable()
         {
             _loadingTween.Stop();
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Clicked?.Invoke(_itemIndex);
         }
     }
 }

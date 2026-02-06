@@ -26,11 +26,6 @@ namespace UI.Banners
         [SerializeField] private float brushDuration = 3f;
         [Header("Stars")]
         [SerializeField] private float starsAngle = 10f;
-        [Header("Items")]
-        [SerializeField] private float itemsAngle = 2.5f;
-        [SerializeField] private float itemsDuration = 3f;
-        [Header("Mask")]
-        [SerializeField] private float maskDuration = 3f;
         [Header("Button")]
         [SerializeField] private float minScale = 0.6f;
         [SerializeField] private float pressDuration = 0.2f;

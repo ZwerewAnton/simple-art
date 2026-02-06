@@ -50,7 +50,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rectTransform: {fileID: 3071089611622788237}
-  isRefreshed: 0
   scrollPresenter: {fileID: 2446808154645372207}
 --- !u!1 &7297300127920968199
 GameObject:
@@ -181,7 +180,7 @@ MonoBehaviour:
   snap: 0
   snapSpeed: 10
   snapThreshold: 0.5
-  itemsPerRow: 2
+  itemsPerRow: 3
   pictureCellSize: 640
   cellSpacing: 40
   horizontalPadding: 60

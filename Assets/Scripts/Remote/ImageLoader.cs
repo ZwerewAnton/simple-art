@@ -43,6 +43,11 @@ namespace Remote
             LoadInternal(url, _cts.Token).Forget();
         }
 
+        public bool HasImage(string url, out Texture2D image)
+        {
+            return _cache.TryGetValue(url, out image);
+        }
+
         private async UniTaskVoid LoadInternal(string url, CancellationToken token)
         {
             using var request = UnityWebRequestTexture.GetTexture(url, false);
