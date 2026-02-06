@@ -1,7 +1,9 @@
 using Coffee.UIExtensions;
 using PrimeTween;
+using UI.Mediators;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Zenject;
+using Button = UnityEngine.UI.Button;
 
 namespace UI.Banners
 {
@@ -11,7 +13,7 @@ namespace UI.Banners
         [SerializeField] private RectTransform[] lights;
         [SerializeField] private RectTransform rays;
         [SerializeField] private RectTransform movingFrame;
-        [SerializeField] private RectTransform button;
+        [SerializeField] private Button button;
         [SerializeField] private RectTransform bigStar;
         [SerializeField] private RectTransform smallStar;
         [SerializeField] private UIParticle uiParticle;
@@ -39,6 +41,28 @@ namespace UI.Banners
         private Tween _buttonRotateTween;
         private Tween _bigStarTween;
 
+        private MainMenuMediator _mainMenuMediator;
+
+        [Inject]
+        private void Construct(MainMenuMediator mainMenuMediator)
+        {
+            _mainMenuMediator = mainMenuMediator;
+        }
+        
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            
+            button.onClick.AddListener(PlayButtonClick);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            
+            button.onClick.RemoveListener(PlayButtonClick);
+        }
+        
         protected override void StartAnimation()
         {
             StopAnimation();
@@ -78,10 +102,10 @@ namespace UI.Banners
             _buttonPressSequence = Sequence.Create(cycles: -1);
 
             _buttonPressSequence.ChainDelay(2f);
-            _buttonPressSequence.Chain(Tween.Scale(button, Vector3.one * minScale, pressDuration, Ease.OutBack));
-            _buttonPressSequence.Chain(Tween.Scale(button, Vector3.one, pressDuration, Ease.OutBack));
+            _buttonPressSequence.Chain(Tween.Scale(button.transform, Vector3.one * minScale, pressDuration, Ease.OutBack));
+            _buttonPressSequence.Chain(Tween.Scale(button.transform, Vector3.one, pressDuration, Ease.OutBack));
             _buttonRotateTween = Tween.LocalRotation(
-                button,
+                button.transform,
                 new Vector3(0, 0, buttonAngle),
                 new Vector3(0, 0, -buttonAngle),
                 buttonRotationDuration,
@@ -140,6 +164,11 @@ namespace UI.Banners
                 cycles: -1,
                 cycleMode:CycleMode.Yoyo
             );
+        }
+
+        private void PlayButtonClick()
+        {
+            _mainMenuMediator.PlayButtonClick();
         }
     }
 }

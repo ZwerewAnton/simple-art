@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Device;
 using UI.Common.ScrollView;
 using UI.Mediators;
 using UI.ScrollViews;
@@ -12,22 +13,29 @@ namespace UI.Pictures
     public class PicturesScrollPresenter : ScrollPresenterBase<PictureItemModel[], PictureGridItemView>
     {
         [Header("Grid")] 
-        [Range(2, 3)] [SerializeField] protected int itemsPerRow = 2;
         [SerializeField] protected float picture2CellSize = 640f;
         [SerializeField] protected float picture3CellSize = 413f;
         [SerializeField] protected float cellSpacing = 40f;
         [SerializeField] protected float horizontalPadding = 60f;
 
+        private int _itemsPerRow = 2; 
+
         private NestedScrollCoordinator _coordinator;
         private DiContainer _diContainer;
         private MainMenuMediator _mainMenuMediator;
+        private IDeviceService _deviceService;
 
         [Inject]
-        private void Construct(NestedScrollCoordinator scrollCoordinator,  DiContainer diContainer, MainMenuMediator mainMenuMediator)
+        private void Construct(
+            NestedScrollCoordinator scrollCoordinator, 
+            DiContainer diContainer,
+            MainMenuMediator mainMenuMediator,
+            IDeviceService deviceService)
         {
             _coordinator = scrollCoordinator;
             _diContainer = diContainer;
             _mainMenuMediator = mainMenuMediator;
+            _deviceService = deviceService;
         }
 
         protected override void OnEnable()
@@ -50,12 +58,13 @@ namespace UI.Pictures
         {
             if (IsInitialized)
                 ClearPool();
-
+            
             IsInitialized = true;
 
             Models.Clear();
 
             var itemRect = itemPrefab.GetComponent<RectTransform>();
+            _itemsPerRow = _deviceService.Device == Device.Device.Phone ? 2 : 3;
             ItemSize = CalculateItemSize(itemRect);
             BorderSpacing = GetBorderSpacing();
             
@@ -72,7 +81,7 @@ namespace UI.Pictures
 
         protected override float CalculateItemSize(RectTransform rect)
         {
-            return itemsPerRow == 3 ? picture3CellSize : picture2CellSize;
+            return _itemsPerRow == 3 ? picture3CellSize : picture2CellSize;
         }
 
         protected override int CalculateViewItemCount(float cellSize)
@@ -95,7 +104,7 @@ namespace UI.Pictures
             
             foreach (var gridItemView in ActiveItems)
             {
-                gridItemView.Initialize(itemsPerRow,  ItemSize, cellSpacing, horizontalPadding);
+                gridItemView.Initialize(_itemsPerRow,  ItemSize, cellSpacing, horizontalPadding);
             }
         }
 
@@ -155,12 +164,14 @@ namespace UI.Pictures
         {
             base.OnItemClicked(itemIndex);
             
+            _mainMenuMediator.PlayButtonClick();
+            
             var item = ActiveItems.FirstOrDefault(i => i.ItemIndex == itemIndex);
             if (item == null)
                 return;
 
             var index = item.ItemIndex;
-            if (index < 0 || index >= Models.Count || cellItemIndex  < 0 || cellItemIndex >= itemsPerRow)
+            if (index < 0 || index >= Models.Count || cellItemIndex  < 0 || cellItemIndex >= _itemsPerRow)
                 return;
             
             var model = Models[index][cellItemIndex];
@@ -179,9 +190,9 @@ namespace UI.Pictures
         {
             var rows = new List<PictureItemModel[]>();
 
-            for (var i = 0; i < models.Count; i += itemsPerRow)
+            for (var i = 0; i < models.Count; i += _itemsPerRow)
             {
-                var count = Mathf.Min(itemsPerRow, models.Count - i);
+                var count = Mathf.Min(_itemsPerRow, models.Count - i);
                 var row = new PictureItemModel[count];
 
                 for (var j = 0; j < count; j++)

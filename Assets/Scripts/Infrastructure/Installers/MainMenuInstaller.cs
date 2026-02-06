@@ -1,4 +1,5 @@
 using Remote;
+using SFX;
 using UI.Mediators;
 using UI.ScrollViews;
 using UnityEngine;
@@ -10,12 +11,19 @@ namespace Infrastructure.Installers
     {
         [SerializeField] private NestedScrollCoordinator nestedScrollCoordinator;
         [SerializeField] private MainMenuMediator mainMenuMediator;
+        [SerializeField] private SfxPlayer sfxPlayer;
         
         public override void InstallBindings()
         {
+            BindSfxPlayer();
             BindNestedScrollCoordinator();
             BindImageLoader();
             BindMainMenuMediator();
+        }
+
+        private void BindSfxPlayer()
+        {
+            Container.Bind<SfxPlayer>().FromInstance(sfxPlayer).AsSingle().NonLazy();
         }
 
         private void BindMainMenuMediator()

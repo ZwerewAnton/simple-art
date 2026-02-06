@@ -4,12 +4,12 @@ namespace UI.Banners
 {
     public abstract class BannerView : MonoBehaviour
     {
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             StartAnimation();
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             StopAnimation();
         }

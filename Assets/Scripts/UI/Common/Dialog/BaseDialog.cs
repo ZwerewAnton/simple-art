@@ -17,7 +17,7 @@ namespace UI.Common.Dialog
             Finish(DialogResult.Cancel);
         }
 
-        protected void Close()
+        protected virtual void Close()
         {
             Finish(DialogResult.Close);
         }

@@ -33,9 +33,9 @@ namespace UI.Banners
         public event Action<int> FocusItemChanged;
         public event Action Initialized;
         public int ItemsCount => _items.Count;
-        public int FocusItemIndex => _centerIndex;
+        public int FocusItemIndex { get; private set; }
 
-        private List<RectTransform> _items = new();
+        private readonly List<RectTransform> _items = new();
 
         private float _itemSize;
         private float _center;
@@ -45,19 +45,20 @@ namespace UI.Banners
         
         private int _nextIndex;
         private int _prevIndex;
-        private int _centerIndex;
-        
-        protected TargetItemData TargetItemData;
-        protected bool ShouldSnap;
-        private float LastDragDirection;
+
+        private TargetItemData _targetItemData;
+        private bool _shouldSnap;
+        private float _lastDragDirection;
         private float _autoScrollTimer;
         
         private IDeviceService _deviceService;
+        private DiContainer _diContainer;
 
         [Inject]
-        private void Construct(IDeviceService deviceService)
+        private void Construct(IDeviceService deviceService, DiContainer diContainer)
         {
             _deviceService = deviceService;
+            _diContainer = diContainer;
         }
         
         protected virtual void OnEnable()
@@ -77,16 +78,16 @@ namespace UI.Banners
             SpawnBanners();
             LayoutItems();
             
-            _centerIndex = 0;
-            _prevIndex = Prev(_centerIndex);
-            _nextIndex = Next(_centerIndex);
+            FocusItemIndex = 0;
+            _prevIndex = Prev(FocusItemIndex);
+            _nextIndex = Next(FocusItemIndex);
             
             Initialized?.Invoke();
         }
 
         private void Update()
         {
-            if (!autoScroll || _dragging || ShouldSnap)
+            if (!autoScroll || _dragging || _shouldSnap)
                 return;
 
             _autoScrollTimer += Time.deltaTime;
@@ -100,7 +101,7 @@ namespace UI.Banners
 
         protected void LateUpdate()
         {
-            if (snap && ShouldSnap)
+            if (snap && _shouldSnap)
                 SmoothSnap();
         }
         
@@ -125,8 +126,8 @@ namespace UI.Banners
             
             if (snap)
             {
-                LastDragDirection = Mathf.Sign(eventData.position.x - eventData.pressPosition.x);
-                TargetItemData = FindNearestItemData();
+                _lastDragDirection = Mathf.Sign(eventData.position.x - eventData.pressPosition.x);
+                _targetItemData = FindNearestItemData();
                 EnableSnap();
             }
         }
@@ -146,7 +147,7 @@ namespace UI.Banners
 
             for (var i = 0; i < count; i++)
             {
-                var relativeIndex = GetRelativeIndex(i, _centerIndex, count);
+                var relativeIndex = GetRelativeIndex(i, FocusItemIndex, count);
                 var x = relativeIndex * _itemSize;
 
                 _items[i].anchoredPosition = new Vector2(x, 0f);
@@ -180,13 +181,13 @@ namespace UI.Banners
                 var newBannerPosition =  _itemSize + centerItemPosition;
                 _items[_prevIndex].anchoredPosition = new Vector2(newBannerPosition, 0f);
                 
-                _centerIndex = _nextIndex;
-                _nextIndex = Next(_centerIndex);
-                _prevIndex = Prev(_centerIndex);
+                FocusItemIndex = _nextIndex;
+                _nextIndex = Next(FocusItemIndex);
+                _prevIndex = Prev(FocusItemIndex);
                 
                 _lastShiftX -= _itemSize;
                 
-                FocusItemChanged?.Invoke(_centerIndex);
+                FocusItemChanged?.Invoke(FocusItemIndex);
             }
             else if (delta >= threshold)
             {
@@ -195,13 +196,13 @@ namespace UI.Banners
 
                 _items[_nextIndex].anchoredPosition = new Vector2(newX, 0f);
 
-                _centerIndex = _prevIndex;
-                _nextIndex = Next(_centerIndex);
-                _prevIndex = Prev(_centerIndex);
+                FocusItemIndex = _prevIndex;
+                _nextIndex = Next(FocusItemIndex);
+                _prevIndex = Prev(FocusItemIndex);
                 
                 _lastShiftX += _itemSize;
                 
-                FocusItemChanged?.Invoke(_centerIndex);
+                FocusItemChanged?.Invoke(FocusItemIndex);
             }
         }
 
@@ -217,8 +218,8 @@ namespace UI.Banners
         
         private void AutoScrollNext()
         {
-            LastDragDirection = -1f;
-            TargetItemData = new TargetItemData
+            _lastDragDirection = -1f;
+            _targetItemData = new TargetItemData
             {
                 ItemIndex = _nextIndex,
                 AnchoredPosition = _items[_nextIndex].anchoredPosition
@@ -230,7 +231,7 @@ namespace UI.Banners
         protected virtual void SmoothSnap()
         {
             var currentX = content.anchoredPosition.x;
-            var targetX = -TargetItemData.AnchoredPosition.x;
+            var targetX = -_targetItemData.AnchoredPosition.x;
 
             var newX = Mathf.Lerp(currentX, targetX, snapSpeed * Time.deltaTime);
             content.anchoredPosition = new Vector2(newX, content.anchoredPosition.y);
@@ -238,8 +239,8 @@ namespace UI.Banners
             if (Mathf.Abs(newX - targetX) < snapThreshold)
             {
                 content.anchoredPosition = new Vector2(targetX, content.anchoredPosition.y);
-                ShouldSnap = false;
-                FocusItemChanged?.Invoke(_centerIndex);
+                _shouldSnap = false;
+                FocusItemChanged?.Invoke(FocusItemIndex);
                 MoveCenter();
             }
         }
@@ -259,9 +260,9 @@ namespace UI.Banners
                 var distance = center - itemCenter;
 
                 var validByDirection =
-                    Mathf.Approximately(LastDragDirection, 0f) ||
-                    (LastDragDirection > 0 && distance >= 0f) ||
-                    (LastDragDirection < 0 && distance <= 0f);
+                    Mathf.Approximately(_lastDragDirection, 0f) ||
+                    (_lastDragDirection > 0 && distance >= 0f) ||
+                    (_lastDragDirection < 0 && distance <= 0f);
 
 
                 var absDist = Mathf.Abs(distance);
@@ -288,7 +289,7 @@ namespace UI.Banners
             var prefabs = _deviceService.Device == Device.Device.Phone ? phoneBannerPrefabs : tabletBannerPrefabs;
             foreach (var t in prefabs)
             {
-                var go = Instantiate(t, content);
+                var go = _diContainer.InstantiatePrefab(t, content);
                 var itemRect = go.GetComponent<RectTransform>();
                 _items.Add(itemRect);
             }
@@ -296,14 +297,14 @@ namespace UI.Banners
         
         private void DisableSnap()
         {
-            ShouldSnap = false;
+            _shouldSnap = false;
             scrollRect.inertia = true;
         }
 
         private void EnableSnap()
         {
             scrollRect.inertia = false;
-            ShouldSnap = true;
+            _shouldSnap = true;
         }
     }
 }

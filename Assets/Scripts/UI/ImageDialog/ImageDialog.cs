@@ -1,24 +1,28 @@
 using System;
 using PrimeTween;
 using UI.Common.Dialog;
+using UI.Mediators;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace UI.ImageDialog
 {
     public class ImageDialog : CloseDialog
     {
-        [SerializeField] private RectTransform rectTransform;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private RawImage rawImage;
         [Header("Animation")]
         [SerializeField] private float animationDuration = 0.5f;
         
         private Tween _animationTween;
+        
+        private MainMenuMediator _mainMenuMediator;
 
-        private void Awake()
+        [Inject]
+        private void Construct(MainMenuMediator mainMenuMediator)
         {
-            rawImage.rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, rectTransform.sizeDelta.x);
+            _mainMenuMediator = mainMenuMediator;
         }
 
         public void Show(Texture2D image)
@@ -38,6 +42,13 @@ namespace UI.ImageDialog
             AnimateClosing();
         }
 
+        protected override void Close()
+        {
+            base.Close();
+            
+            _mainMenuMediator.PlayButtonClick();
+        }
+
         private void AnimateOpening()
         {
             if (_animationTween.isAlive)
@@ -55,7 +66,7 @@ namespace UI.ImageDialog
         private void AnimateClosing()
         {
             if (_animationTween.isAlive)
-                _animationTween.Stop();
+                _animationTween.Complete();
 
             canvasGroup.alpha = 1;
 

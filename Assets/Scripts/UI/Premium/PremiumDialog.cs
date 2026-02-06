@@ -1,11 +1,15 @@
 using PrimeTween;
 using UI.Common.Dialog;
+using UI.Mediators;
 using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 namespace UI.Premium
 {
     public class PremiumDialog : CloseDialog
     {
+        [SerializeField] private Button continueButton;
         [SerializeField] private RectTransform roll;
         [SerializeField] private RectTransform mask;
         [Header("Animation")]
@@ -16,6 +20,26 @@ namespace UI.Premium
         [SerializeField] private float maskOffHeight = 1f;
 
         private Sequence _animationSequence;
+
+        private MainMenuMediator _mainMenuMediator;
+
+        [Inject]
+        private void Construct(MainMenuMediator mainMenuMediator)
+        {
+            _mainMenuMediator = mainMenuMediator;
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            continueButton.onClick.AddListener(PlayButtonClick);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            continueButton.onClick.RemoveListener(PlayButtonClick);
+        }
 
         public override void Show()
         {
@@ -28,10 +52,17 @@ namespace UI.Premium
             AnimateClosing();
         }
         
+        protected override void Close()
+        {
+            base.Close();
+            
+            PlayButtonClick();
+        }
+        
         private void AnimateOpening()
         {
             if (_animationSequence.isAlive)
-                _animationSequence.Stop();
+                return;
             
             roll.gameObject.SetActive(true);
             _animationSequence = Sequence.Create();
@@ -58,7 +89,7 @@ namespace UI.Premium
         private void AnimateClosing()
         {
             if (_animationSequence.isAlive)
-                _animationSequence.Stop();
+                return;
             
             roll.gameObject.SetActive(true);
             _animationSequence = Sequence.Create();
@@ -80,6 +111,11 @@ namespace UI.Premium
                     Ease.InOutSine
                 )
             );
+        }
+
+        private void PlayButtonClick()
+        {
+            _mainMenuMediator.PlayButtonClick();
         }
     }
 }

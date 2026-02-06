@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Remote;
+using SFX;
 using UI.Banners;
 using UI.Banners.Dots;
 using UI.Categories.CategoriesScrollView;
@@ -21,11 +22,13 @@ namespace UI.Mediators
         [SerializeField] private ImageDialog.ImageDialog imageDialog;
 
         private ILoader _imageLoader;
+        private SfxPlayer _sfxPlayer;
 
         [Inject]
-        private void Construct(ILoader imageLoader)
+        private void Construct(ILoader imageLoader, SfxPlayer sfxPlayer)
         {
             _imageLoader = imageLoader;
+            _sfxPlayer = sfxPlayer;
         }
 
         private void OnEnable()
@@ -60,6 +63,8 @@ namespace UI.Mediators
         
         public void ShowPremiumDialog() => premiumDialog.Show();
 
+        public void PlayButtonClick() => _sfxPlayer.PlayButtonClip();
+
         private void OnCategoriesScrollCenteredItemChanged(int index)
         {
             categoryScrollPresenter.SelectModel(index);
@@ -68,6 +73,7 @@ namespace UI.Mediators
 
         private void OnCategoryItemClicked(int index)
         {
+            PlayButtonClick();
             categoriesScrollPresenter.MoveToItem(index);
             selectionIndicator.MoveByIndex(index);
         }
