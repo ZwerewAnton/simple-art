@@ -1,3 +1,4 @@
+using Coffee.UIExtensions;
 using PrimeTween;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
@@ -13,7 +14,7 @@ namespace UI.Banners
         [SerializeField] private RectTransform logo;
         [SerializeField] private RectTransform brush;
         [SerializeField] private RectTransform mask;
-        [SerializeField] private ParticleSystem particleSystem;
+        [SerializeField] private UIParticle uiParticle;
         
         [Header("Rays")]
         [SerializeField] private float raysPulseScale = 0.1f;
@@ -48,7 +49,7 @@ namespace UI.Banners
         {
             StopAnimation();
 
-            particleSystem.Play();
+            uiParticle.Play();
             AnimateButton();
             AnimateStars();
             AnimatePaint();
@@ -71,7 +72,7 @@ namespace UI.Banners
                 _brushTween.Stop();
             if (_buttonRotateTween.isAlive)
                 _buttonRotateTween.Stop();
-            particleSystem.Stop();
+            uiParticle.Stop();
         }
 
         private void AnimateButton()

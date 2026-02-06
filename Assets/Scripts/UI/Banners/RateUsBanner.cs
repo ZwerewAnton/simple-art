@@ -1,3 +1,4 @@
+using Coffee.UIExtensions;
 using PrimeTween;
 using UnityEngine;
 
@@ -12,14 +13,12 @@ namespace UI.Banners
         [SerializeField] private RectTransform button;
         [SerializeField] private RectTransform bigStar;
         [SerializeField] private RectTransform smallStar;
-        [SerializeField] private ParticleSystem particleSystem;
+        [SerializeField] private UIParticle particleSystem;
         
         [Header("Lights")]
         [SerializeField] private float lightScaleDelta = 0.08f;
         [SerializeField] private float lightDuration = 1.2f;
         [Header("Rays")]
-        [SerializeField] private float raysPulseScale = 0.1f;
-        [SerializeField] private float raysPulseDuration = 2f;
         [SerializeField] private float raysAngle = 50f;
         [SerializeField] private float raysRotationDuration = 12f;
         [Header("Frame")]

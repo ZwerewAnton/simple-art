@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UI.Banners;
 using UI.Banners.Dots;
 using UI.Categories.CategoriesScrollView;
@@ -30,6 +31,12 @@ namespace UI.Mediators
             bannerScrollPresenter.Initialized -= OnBannerScrollInitialized;
             bannerScrollPresenter.FocusItemChanged -= OnBannerFocusItemChanged;
         }
+        
+        public void InitializeTabs(List<CategoryItemModel> categoryItemModels) 
+            => categoryScrollPresenter.Initialize(categoryItemModels);
+        
+        public void InitializeCategories(List<CategoriesItemModel> categoriesItemModels) 
+            => categoriesScrollPresenter.Initialize(categoriesItemModels);
 
         private void OnCategoriesScrollCenteredItemChanged(int index)
         {

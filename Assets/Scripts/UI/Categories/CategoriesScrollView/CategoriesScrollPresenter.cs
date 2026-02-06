@@ -50,6 +50,10 @@ namespace UI.Categories.CategoriesScrollView
             base.OnBeginDrag(eventData);
 
             SaveViewsPosition();
+            foreach (var itemView in ActiveItems)
+            {
+                itemView.isRefreshed = false;
+            }
         }
 
         public override void OnEndDrag(PointerEventData eventData)

@@ -14,6 +14,14 @@ Shader "UI/AnimatedThreeColorGradient"
         _RightColorB ("Right Color B", Color) = (0,0,1,1)
 
         _Speed ("Animation Speed", Float) = 1
+
+        // --- UI STENCIL SUPPORT ---
+        _StencilComp ("Stencil Comparison", Float) = 8
+        _Stencil ("Stencil ID", Float) = 0
+        _StencilOp ("Stencil Operation", Float) = 0
+        _StencilWriteMask ("Stencil Write Mask", Float) = 255
+        _StencilReadMask ("Stencil Read Mask", Float) = 255
+        _ColorMask ("Color Mask", Float) = 15
     }
 
     SubShader
@@ -29,15 +37,19 @@ Shader "UI/AnimatedThreeColorGradient"
 
         Stencil
         {
-            Ref 1
-            Comp Always
-            Pass Keep
+            Ref [_Stencil]
+            Comp [_StencilComp]
+            Pass [_StencilOp]
+            ReadMask [_StencilReadMask]
+            WriteMask [_StencilWriteMask]
         }
 
         Cull Off
         Lighting Off
         ZWrite Off
+        ZTest [unity_GUIZTestMode]
         Blend SrcAlpha OneMinusSrcAlpha
+        ColorMask [_ColorMask]
 
         Pass
         {
@@ -89,37 +101,29 @@ Shader "UI/AnimatedThreeColorGradient"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // Sprite texture
                 fixed4 tex = tex2D(_MainTex, i.uv) * i.color;
 
-                // Mask support
+                // RectMask2D support
                 tex.a *= UnityGet2DClipping(i.worldPos.xy, _ClipRect);
 
-                // Time animation
                 float t = (sin(_Time.y * _Speed) + 1) * 0.5;
 
-                // Animated edge colors
                 fixed4 leftColor  = lerp(_LeftColorA,  _LeftColorB,  t);
                 fixed4 rightColor = lerp(_RightColorA, _RightColorB, t);
 
-                // UV.x split
                 float x = i.uv.x;
-
                 fixed4 gradientColor;
 
                 if (x < 0.5)
                 {
-                    float lt = saturate(x / 0.5);
-                    gradientColor = lerp(leftColor, _CenterColor, lt);
+                    gradientColor = lerp(leftColor, _CenterColor, saturate(x / 0.5));
                 }
                 else
                 {
-                    float rt = saturate((x - 0.5) / 0.5);
-                    gradientColor = lerp(_CenterColor, rightColor, rt);
+                    gradientColor = lerp(_CenterColor, rightColor, saturate((x - 0.5) / 0.5));
                 }
 
                 tex.rgb *= gradientColor.rgb;
-
                 return tex;
             }
             ENDCG

@@ -9,7 +9,7 @@ namespace UI.Common.ScrollView
     {
         [SerializeField] private RectTransform rectTransform;
         public int ItemIndex { get; set; } = -1;
-        public bool isRefreshed = false;
+        public bool isRefreshed;
 
         public RectTransform RectTransform => rectTransform;
         
@@ -25,7 +25,6 @@ namespace UI.Common.ScrollView
         public virtual void SetData(int itemIndex, TModel model)
         {
             ItemIndex = itemIndex;
-            isRefreshed = true;
         }
 
         public void SetAnchoredPosition(Vector2 position)

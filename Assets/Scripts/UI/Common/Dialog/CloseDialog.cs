@@ -7,12 +7,12 @@ namespace UI.Common.Dialog
     {
         [SerializeField] private Button closeButton;
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             closeButton.onClick.AddListener(Close);
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             closeButton.onClick.RemoveListener(Close);
         }

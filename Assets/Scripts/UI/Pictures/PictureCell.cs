@@ -58,7 +58,7 @@ namespace UI.Pictures
                 if (localRequestId != _requestId || _currentUrl != url && !this)
                     return;
 
-                if (!gameObject.activeInHierarchy)
+                if (gameObject != null  && !gameObject.activeInHierarchy)
                     return;
 
                 if (!fromCache)
