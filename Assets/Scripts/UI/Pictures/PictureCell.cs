@@ -1,5 +1,3 @@
-using System;
-using Cysharp.Threading.Tasks;
 using PrimeTween;
 using Remote;
 using UnityEngine;
@@ -86,7 +84,6 @@ namespace UI.Pictures
         {
             _loadingTween.Stop();
             loading.gameObject.SetActive(true);
-            //loading.color = new Color(1, 1, 1, 0);
 
             _loadingTween = Tween.Alpha(
                 loading,

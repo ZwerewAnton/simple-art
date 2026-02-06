@@ -37,7 +37,6 @@ namespace UI.Banners
 
         private float _itemSize;
         private float _center;
-        private float _threshold = 50f;
         private bool _dragging = false;
         private float _lastShiftX;
         private int _lastCenterBannerIndex;
