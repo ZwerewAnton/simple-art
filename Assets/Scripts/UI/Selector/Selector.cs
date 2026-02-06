@@ -5,13 +5,12 @@ namespace UI.Selector
 {
     public class Selector : MonoBehaviour
     {
-        [Header("Items")]
-        [SerializeField] private List<SelectorItem> items;
+        [Header("Items")] [SerializeField] private List<SelectorItem> items;
+
         [SerializeField] private int startElement;
-        
-        [Header("Animation")]
-        [SerializeField] private float animationTime = 0.3f;
-        
+
+        [Header("Animation")] [SerializeField] private float animationTime = 0.3f;
+
         private SelectorItem _current;
 
         private void Awake()
@@ -20,23 +19,23 @@ namespace UI.Selector
                 item.Clicked += OnItemClicked;
         }
 
-        private void OnDestroy()
-        {
-            foreach (var item in items)
-                item.Clicked -= OnItemClicked;
-        }
-
         private void Start()
         {
             if (startElement < 0 && startElement >= items.Count)
                 return;
-            
+
             for (var i = 0; i < items.Count; i++)
             {
                 items[i].SetActiveImmediately(startElement == i);
                 if (startElement == i)
                     _current = items[i];
             }
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var item in items)
+                item.Clicked -= OnItemClicked;
         }
 
         private void OnItemClicked(SelectorItem item)

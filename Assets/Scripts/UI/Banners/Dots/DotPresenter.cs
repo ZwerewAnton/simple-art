@@ -13,7 +13,7 @@ namespace UI.Banners.Dots
         {
             for (var i = 0; i < count; i++)
             {
-                var dot =  Instantiate(dotPrefab,  transform);
+                var dot = Instantiate(dotPrefab, transform);
                 _dots.Add(dot);
             }
 
@@ -25,10 +25,7 @@ namespace UI.Banners.Dots
             if (index < 0 || index >= _dots.Count)
                 return;
 
-            for (var i = 0; i < _dots.Count; i++)
-            {
-                _dots[i].ChangeActive(i == index);
-            }
+            for (var i = 0; i < _dots.Count; i++) _dots[i].ChangeActive(i == index);
         }
     }
 }

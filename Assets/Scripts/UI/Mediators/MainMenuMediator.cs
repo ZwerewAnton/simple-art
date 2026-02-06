@@ -24,13 +24,6 @@ namespace UI.Mediators
         private ILoader _imageLoader;
         private SfxPlayer _sfxPlayer;
 
-        [Inject]
-        private void Construct(ILoader imageLoader, SfxPlayer sfxPlayer)
-        {
-            _imageLoader = imageLoader;
-            _sfxPlayer = sfxPlayer;
-        }
-
         private void OnEnable()
         {
             categoryScrollPresenter.Initialized += OnCategoryScrollInitialized;
@@ -47,23 +40,40 @@ namespace UI.Mediators
             bannerScrollPresenter.Initialized -= OnBannerScrollInitialized;
             bannerScrollPresenter.FocusItemChanged -= OnBannerFocusItemChanged;
         }
-        
-        public void InitializeTabs(List<CategoryItemModel> categoryItemModels) 
-            => categoryScrollPresenter.Initialize(categoryItemModels);
-        
-        public void InitializeCategories(List<CategoriesItemModel> categoriesItemModels) 
-            => categoriesScrollPresenter.Initialize(categoriesItemModels);
-        
+
+        [Inject]
+        private void Construct(ILoader imageLoader, SfxPlayer sfxPlayer)
+        {
+            _imageLoader = imageLoader;
+            _sfxPlayer = sfxPlayer;
+        }
+
+        public void InitializeTabs(List<CategoryItemModel> categoryItemModels)
+        {
+            categoryScrollPresenter.Initialize(categoryItemModels);
+        }
+
+        public void InitializeCategories(List<CategoriesItemModel> categoriesItemModels)
+        {
+            categoriesScrollPresenter.Initialize(categoriesItemModels);
+        }
+
         public void ShowImageDialog(string url)
         {
             var result = _imageLoader.HasImage(url, out var image);
             if (result)
                 imageDialog.Show(image);
         }
-        
-        public void ShowPremiumDialog() => premiumDialog.Show();
 
-        public void PlayButtonClick() => _sfxPlayer.PlayButtonClip();
+        public void ShowPremiumDialog()
+        {
+            premiumDialog.Show();
+        }
+
+        public void PlayButtonClick()
+        {
+            _sfxPlayer.PlayButtonClip();
+        }
 
         private void OnCategoriesScrollCenteredItemChanged(int index)
         {
@@ -77,14 +87,20 @@ namespace UI.Mediators
             categoriesScrollPresenter.MoveToItem(index);
             selectionIndicator.MoveByIndex(index);
         }
-        
-        private void OnCategoryScrollInitialized() 
-            => selectionIndicator.Setup(categoryScrollPresenter.ItemSize, categoryScrollPresenter.ModelsCount);
 
-        private void OnBannerScrollInitialized() 
-            => dotPresenter.SpawnDots(bannerScrollPresenter.ItemsCount, bannerScrollPresenter.FocusItemIndex);
-        
-        private void OnBannerFocusItemChanged(int index) 
-            => dotPresenter.SetDotActive(index);
+        private void OnCategoryScrollInitialized()
+        {
+            selectionIndicator.Setup(categoryScrollPresenter.ItemSize, categoryScrollPresenter.ModelsCount);
+        }
+
+        private void OnBannerScrollInitialized()
+        {
+            dotPresenter.SpawnDots(bannerScrollPresenter.ItemsCount, bannerScrollPresenter.FocusItemIndex);
+        }
+
+        private void OnBannerFocusItemChanged(int index)
+        {
+            dotPresenter.SetDotActive(index);
+        }
     }
 }

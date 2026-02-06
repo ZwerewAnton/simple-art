@@ -9,18 +9,24 @@ namespace UI.Pictures
     public class PictureGridItemView : ScrollItemView<PictureItemModel[]>
     {
         [SerializeField] private PictureCell cellPrefab;
-        public event Action<int, int> CellClicked;
+
+        private readonly List<PictureCell> _cells = new();
 
         private DiContainer _diContainer;
-        
-        private readonly List<PictureCell> _cells = new();
+
+        private void OnDestroy()
+        {
+            foreach (var cell in _cells) cell.Clicked -= OnCellClicked;
+        }
+
+        public event Action<int, int> CellClicked;
 
         [Inject]
         private void Construct(DiContainer diContainer)
         {
             _diContainer = diContainer;
         }
-        
+
         public void Initialize(
             int itemsPerRow,
             float cellSize,
@@ -31,7 +37,7 @@ namespace UI.Pictures
             CreateCells(itemsPerRow, cellSize);
             LayoutCells(cellSize, cellSpacing, horizontalPadding);
         }
-        
+
         public override void SetData(int itemIndex, PictureItemModel[] model)
         {
             base.SetData(itemIndex, model);
@@ -69,7 +75,7 @@ namespace UI.Pictures
         {
             CellClicked?.Invoke(ItemIndex, cellItemIndex);
         }
-        
+
         private void LayoutCells(
             float cellSize,
             float cellSpacing,
@@ -92,18 +98,10 @@ namespace UI.Pictures
                 _cells[i].SetPosition(new Vector2(x, 0f));
             }
         }
-        
+
         private void SetSize(float size)
         {
             RectTransform.sizeDelta = new Vector2(RectTransform.sizeDelta.x, size);
-        }
-
-        private void OnDestroy()
-        {
-            foreach (var cell in _cells)
-            {
-                cell.Clicked -= OnCellClicked;
-            }
         }
     }
 }

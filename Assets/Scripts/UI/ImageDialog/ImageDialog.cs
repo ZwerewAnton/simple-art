@@ -1,4 +1,3 @@
-using System;
 using PrimeTween;
 using UI.Common.Dialog;
 using UI.Mediators;
@@ -12,11 +11,11 @@ namespace UI.ImageDialog
     {
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private RawImage rawImage;
-        [Header("Animation")]
-        [SerializeField] private float animationDuration = 0.5f;
-        
+
+        [Header("Animation")] [SerializeField] private float animationDuration = 0.5f;
+
         private Tween _animationTween;
-        
+
         private MainMenuMediator _mainMenuMediator;
 
         [Inject]
@@ -30,7 +29,7 @@ namespace UI.ImageDialog
             Show();
             rawImage.texture = image;
         }
-        
+
         public override void Show()
         {
             base.Show();
@@ -45,7 +44,7 @@ namespace UI.ImageDialog
         protected override void Close()
         {
             base.Close();
-            
+
             _mainMenuMediator.PlayButtonClick();
         }
 

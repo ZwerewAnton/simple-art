@@ -5,27 +5,30 @@ namespace UI.Banners
 {
     public class SimpleArtBanner : BannerView
     {
-        [Header("Elements")]
-        [SerializeField] private RectTransform[] lights;
+        [Header("Elements")] [SerializeField] private RectTransform[] lights;
+
         [SerializeField] private RectTransform rays;
         [SerializeField] private RectTransform movingFrame;
         [SerializeField] private RectTransform simpleArtLogo;
-        
-        [Header("Lights")]
-        [SerializeField] private float lightScaleDelta = 0.08f;
+
+        [Header("Lights")] [SerializeField] private float lightScaleDelta = 0.08f;
+
         [SerializeField] private float lightDuration = 1.2f;
-        [Header("Rays and Logo")]
-        [SerializeField] private float raysPulseScale = 0.1f;
+
+        [Header("Rays and Logo")] [SerializeField]
+        private float raysPulseScale = 0.1f;
+
         [SerializeField] private float raysPulseDuration = 2f;
         [SerializeField] private float raysAngle = 50f;
         [SerializeField] private float raysRotationDuration = 12f;
-        [Header("Frame")]
-        [SerializeField] private float frameAngle = 2.5f;
+
+        [Header("Frame")] [SerializeField] private float frameAngle = 2.5f;
+
         [SerializeField] private float frameDuration = 3f;
-        
+        private Tween _frameTween;
+
         private Sequence _lightSequence;
         private Sequence _logoRaySequence;
-        private Tween _frameTween;
         private Tween _rayTween;
 
         protected override void StartAnimation()
@@ -51,8 +54,8 @@ namespace UI.Banners
 
         private void AnimateLights()
         {
-            _lightSequence = Sequence.Create(cycles: -1, Sequence.SequenceCycleMode.Yoyo);
-            
+            _lightSequence = Sequence.Create(-1, Sequence.SequenceCycleMode.Yoyo);
+
             for (var i = 0; i < lights.Length; i++)
             {
                 var lightRect = lights[i];
@@ -60,7 +63,7 @@ namespace UI.Banners
 
                 var inverted = i % 2 == 1;
                 var from = inverted ? 1f - lightScaleDelta : 1f + lightScaleDelta;
-                var to   = inverted ? 1f + lightScaleDelta : 1f - lightScaleDelta;
+                var to = inverted ? 1f + lightScaleDelta : 1f - lightScaleDelta;
 
                 _lightSequence.Group(
                     Tween.Scale(
@@ -73,7 +76,7 @@ namespace UI.Banners
                 );
             }
         }
-        
+
         private void AnimateRaysAndLogo()
         {
             _rayTween = Tween.LocalRotation(
@@ -82,12 +85,12 @@ namespace UI.Banners
                 new Vector3(0, 0, raysAngle),
                 raysRotationDuration,
                 Ease.InOutSine,
-                cycles: -1,
-                cycleMode:CycleMode.Yoyo
+                -1,
+                CycleMode.Yoyo
             );
-            
-            _logoRaySequence = Sequence.Create(cycles: -1, Sequence.SequenceCycleMode.Yoyo);
-            
+
+            _logoRaySequence = Sequence.Create(-1, Sequence.SequenceCycleMode.Yoyo);
+
             _logoRaySequence.Group(
                 Tween.Scale(
                     rays,
@@ -97,7 +100,7 @@ namespace UI.Banners
                     Ease.InOutSine
                 )
             );
-            
+
             _logoRaySequence.Group(
                 Tween.Scale(
                     simpleArtLogo,
@@ -108,7 +111,7 @@ namespace UI.Banners
                 )
             );
         }
-        
+
         private void AnimateFrame()
         {
             _frameTween = Tween.LocalRotation(
@@ -117,8 +120,8 @@ namespace UI.Banners
                 new Vector3(0, 0, frameAngle),
                 frameDuration,
                 Ease.InOutSine,
-                cycles: -1,
-                cycleMode:CycleMode.Yoyo
+                -1,
+                CycleMode.Yoyo
             );
         }
     }

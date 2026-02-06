@@ -12,7 +12,7 @@ namespace Infrastructure.Installers
         [SerializeField] private NestedScrollCoordinator nestedScrollCoordinator;
         [SerializeField] private MainMenuMediator mainMenuMediator;
         [SerializeField] private SfxPlayer sfxPlayer;
-        
+
         public override void InstallBindings()
         {
             BindSfxPlayer();

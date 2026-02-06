@@ -12,7 +12,7 @@ namespace UI.Common.ScrollView
         public bool IsRefreshed { get; set; }
 
         public RectTransform RectTransform => rectTransform;
-        
+
         public bool Active => gameObject.activeSelf;
 
         public void OnPointerClick(PointerEventData eventData)
@@ -34,9 +34,9 @@ namespace UI.Common.ScrollView
 
         public void SetActive(bool active)
         {
-            if (gameObject.activeSelf == active) 
+            if (gameObject.activeSelf == active)
                 return;
-            
+
             gameObject.SetActive(active);
             IsRefreshed = false;
         }

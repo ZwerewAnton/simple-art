@@ -14,31 +14,32 @@ namespace UI.Common.ScrollView
         [SerializeField] protected RectTransform content;
         [SerializeField] protected GameObject itemPrefab;
 
-        [Header("Items")] 
-        [Range(0f, 500f)] [SerializeField] protected float itemSpacing = 50f;
+        [Header("Items")] [Range(0f, 500f)] [SerializeField]
+        protected float itemSpacing = 50f;
+
         [Range(0f, 500f)] [SerializeField] protected float borderSpacing = 50f;
         [Range(0f, 10f)] [SerializeField] protected int additionalPoolItemsCount = 2;
 
-        [Header("Snap")] 
-        [SerializeField] protected bool snap;
+        [Header("Snap")] [SerializeField] protected bool snap;
+
         [SerializeField] [Range(0f, 20f)] protected float snapSpeed = 10f;
         [SerializeField] protected float snapThreshold = 0.5f;
-        
-        public event Action Initialized;
-        public float ItemSize { get; protected set; }
-        public int ModelsCount => Models.Count;
-        
+
         protected readonly List<TItem> ActiveItems = new();
         protected readonly List<TModel> Models = new();
+
+        private bool _markToUpdate;
         protected float BorderSpacing;
         protected bool IsInitialized;
-        protected int ViewItemCount;
         private float LastDragDirection;
-        
-        protected TargetItemData TargetItemData;
         protected bool ShouldSnap;
-        
-        private bool _markToUpdate;
+
+        protected TargetItemData TargetItemData;
+        protected int ViewItemCount;
+        public float ItemSize { get; protected set; }
+        public int ModelsCount => Models.Count;
+
+        public event Action Initialized;
 
         #region Unity Events
 
@@ -52,7 +53,7 @@ namespace UI.Common.ScrollView
         {
             UpdateScroll();
         }
-        
+
         protected void LateUpdate()
         {
             if (snap && ShouldSnap)
@@ -115,9 +116,9 @@ namespace UI.Common.ScrollView
             ViewItemCount = CalculateViewItemCount(cellSize);
 
             CreatePool();
-            
+
             Initialized?.Invoke();
-            
+
             UpdateVisibleItems();
         }
 
@@ -133,7 +134,7 @@ namespace UI.Common.ScrollView
         {
             return Mathf.Min(Models.Count, Mathf.CeilToInt(GetViewportSize() / cellSize)) + additionalPoolItemsCount;
         }
-        
+
         protected virtual void SetupItemRectTransform(RectTransform rect)
         {
             if (scrollRect.horizontal)
@@ -221,7 +222,7 @@ namespace UI.Common.ScrollView
             var viewportSize = GetViewportSize();
             var lastVisibleIndex =
                 Mathf.CeilToInt((offset - borderSpacing - cellSize + viewportSize) / cellSize);
-            
+
             for (var i = 0; i < ActiveItems.Count; i++)
             {
                 var modelIndex = firstVisibleIndex + i;
@@ -235,10 +236,7 @@ namespace UI.Common.ScrollView
 
                 item.SetActive(true);
 
-                if (item.ItemIndex != modelIndex || !item.IsRefreshed)
-                {
-                    item.SetData(modelIndex, Models[modelIndex]);
-                }
+                if (item.ItemIndex != modelIndex || !item.IsRefreshed) item.SetData(modelIndex, Models[modelIndex]);
 
                 item.SetAnchoredPosition(GetAnchoredPosition(modelIndex));
             }
@@ -294,10 +292,7 @@ namespace UI.Common.ScrollView
 
         protected void MarkViewsToRefresh()
         {
-            foreach (var itemView in ActiveItems)
-            {
-                itemView.IsRefreshed = false;
-            }
+            foreach (var itemView in ActiveItems) itemView.IsRefreshed = false;
         }
 
         protected void MarkToUpdate()
@@ -339,9 +334,8 @@ namespace UI.Common.ScrollView
 
         protected virtual void OnSnapEnded()
         {
-            
         }
-        
+
         protected virtual TargetItemData FindNearestItemData()
         {
             var center = -content.anchoredPosition.x;

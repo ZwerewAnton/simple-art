@@ -8,27 +8,38 @@ using Zenject;
 
 namespace UI.Pictures
 {
-    public class PictureCell :  MonoBehaviour, IPointerClickHandler
+    public class PictureCell : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private RectTransform rectTransform;
         [SerializeField] private Image loading;
         [SerializeField] private Image badge;
         [SerializeField] private RawImage image;
-        public event Action<int> Clicked;
+        private string _currentUrl;
 
         private ILoader _imageLoader;
-        private string _currentUrl;
-        private int _requestId;
         private int _itemIndex = -1;
-        
+
         private Tween _loadingTween;
+        private int _requestId;
+
+        private void OnDisable()
+        {
+            _loadingTween.Stop();
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Clicked?.Invoke(_itemIndex);
+        }
+
+        public event Action<int> Clicked;
 
         [Inject]
         private void Construct(ILoader imageLoader)
         {
             _imageLoader = imageLoader;
         }
-        
+
         public void SetSize(float size)
         {
             rectTransform.sizeDelta = new Vector2(size, size);
@@ -55,7 +66,7 @@ namespace UI.Pictures
         {
             badge.enabled = active;
         }
-        
+
         public void SetImage(string url)
         {
             _currentUrl = url;
@@ -66,16 +77,13 @@ namespace UI.Pictures
 
             _imageLoader.Load(url, (texture, fromCache) =>
             {
-                if (localRequestId != _requestId || _currentUrl != url && !this)
+                if (localRequestId != _requestId || (_currentUrl != url && !this))
                     return;
 
-                if (gameObject != null  && !gameObject.activeInHierarchy)
+                if (gameObject != null && !gameObject.activeInHierarchy)
                     return;
 
-                if (!fromCache)
-                {
-                    ShowLoading();
-                }
+                if (!fromCache) ShowLoading();
 
                 image.texture = texture;
 
@@ -100,8 +108,8 @@ namespace UI.Pictures
                 loading,
                 0f,
                 1f,
-                duration: 0.2f,
-                ease: Ease.OutQuad
+                0.2f,
+                Ease.OutQuad
             );
         }
 
@@ -113,12 +121,9 @@ namespace UI.Pictures
                 loading,
                 1f,
                 0f,
-                duration: 0.25f,
-                ease: Ease.OutQuad
-            ).OnComplete(() =>
-            {
-                loading.gameObject.SetActive(false);
-            });
+                0.25f,
+                Ease.OutQuad
+            ).OnComplete(() => { loading.gameObject.SetActive(false); });
         }
 
         private void StopLoadingInstant()
@@ -126,16 +131,6 @@ namespace UI.Pictures
             _loadingTween.Stop();
             loading.gameObject.SetActive(false);
             loading.color = new Color(1, 1, 1, 1);
-        }
-
-        private void OnDisable()
-        {
-            _loadingTween.Stop();
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            Clicked?.Invoke(_itemIndex);
         }
     }
 }

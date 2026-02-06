@@ -1,19 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using Object = UnityEngine.Object;
-using System.Threading;
 
 namespace Remote
 {
     public class ImageLoader : IDisposable, ILoader
     {
         private readonly Dictionary<string, Texture2D> _cache = new();
-        private readonly Dictionary<string, List<Action<Texture2D>>> _pendingCallbacks = new();
 
         private readonly CancellationTokenSource _cts = new();
+        private readonly Dictionary<string, List<Action<Texture2D>>> _pendingCallbacks = new();
+
+        public void Dispose()
+        {
+            _cts.Cancel();
+            _cts.Dispose();
+
+            ClearCache();
+            _pendingCallbacks.Clear();
+        }
 
         public void Load(string url, Action<Texture2D, bool> onComplete)
         {
@@ -92,15 +101,6 @@ namespace Remote
                 Object.Destroy(tex);
 
             _cache.Clear();
-        }
-
-        public void Dispose()
-        {
-            _cts.Cancel();
-            _cts.Dispose();
-
-            ClearCache();
-            _pendingCallbacks.Clear();
         }
     }
 }

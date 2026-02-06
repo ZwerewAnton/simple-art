@@ -7,7 +7,7 @@ namespace Infrastructure.Installers
 {
     public class ProjectInstaller : MonoInstaller
     {
-        [SerializeField] private SystemConfig  systemConfig;
+        [SerializeField] private SystemConfig systemConfig;
 
         public override void InstallBindings()
         {

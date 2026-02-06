@@ -11,18 +11,24 @@ namespace UI.ScrollViews.CategoryScrollView
     {
         [SerializeField] private TMP_Text categoryName;
         [SerializeField] private Image separator;
-        
+
         private Tween _colorTween;
-        
+
+        private void OnDisable()
+        {
+            if (_colorTween.isAlive)
+                _colorTween.Stop();
+        }
+
         public override void SetData(int itemIndex, CategoryItemModel model)
         {
             base.SetData(itemIndex, model);
-            
+
             categoryName.SetText(model.categoryName);
             separator.gameObject.SetActive(!model.isLast);
             AnimateTextColor(model.isSelected);
         }
-        
+
         private void AnimateTextColor(bool isSelected)
         {
             var targetColor = isSelected ? Color.red : Color.black;
@@ -34,17 +40,11 @@ namespace UI.ScrollViews.CategoryScrollView
                 _colorTween.Stop();
 
             _colorTween = Tween.Color(
-                target: categoryName,
-                endValue: targetColor,
-                duration: 0.4f,
-                ease: Ease.OutQuad
+                categoryName,
+                targetColor,
+                0.4f,
+                Ease.OutQuad
             );
-        }
-
-        private void OnDisable()
-        {
-            if (_colorTween.isAlive)
-                _colorTween.Stop();
         }
     }
 }

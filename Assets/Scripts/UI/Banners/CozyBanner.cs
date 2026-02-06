@@ -4,67 +4,68 @@ using UI.Mediators;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using Random = Unity.Mathematics.Random;
 
 namespace UI.Banners
 {
     public class CozyBanner : BannerView
     {
-        [Header("Elements")]
-        [SerializeField] private RectTransform[] stars;
+        [Header("Elements")] [SerializeField] private RectTransform[] stars;
+
         [SerializeField] private RectTransform rays;
         [SerializeField] private Button button;
         [SerializeField] private RectTransform logo;
         [SerializeField] private RectTransform brush;
         [SerializeField] private RectTransform mask;
         [SerializeField] private UIParticle uiParticle;
-        
-        [Header("Rays")]
-        [SerializeField] private float raysPulseScale = 0.1f;
+
+        [Header("Rays")] [SerializeField] private float raysPulseScale = 0.1f;
+
         [SerializeField] private float raysPulseDuration = 2f;
         [SerializeField] private float raysAngle = 50f;
         [SerializeField] private float raysRotationDuration = 12f;
-        [Header("Brush")]
-        [SerializeField] private float brushAngle = 2.5f;
+
+        [Header("Brush")] [SerializeField] private float brushAngle = 2.5f;
+
         [SerializeField] private float brushDuration = 3f;
-        [Header("Stars")]
-        [SerializeField] private float starsAngle = 10f;
-        [Header("Button")]
-        [SerializeField] private float minScale = 0.6f;
+
+        [Header("Stars")] [SerializeField] private float starsAngle = 10f;
+
+        [Header("Button")] [SerializeField] private float minScale = 0.6f;
+
         [SerializeField] private float pressDuration = 0.2f;
         [SerializeField] private float buttonAngle = 10f;
         [SerializeField] private float buttonRotationDuration = 3f;
-        
-        private Sequence _buttonPressSequence;
-        private Sequence _paintSequence;
-        private Sequence _starsSequence;
         private Tween _brushTween;
-        private Sequence _logoRaySequence;
-        private Tween _buttonRotateTween;
-        private Tween _rayTween;
-        
-        private MainMenuMediator _mainMenuMediator;
 
-        [Inject]
-        private void Construct(MainMenuMediator mainMenuMediator)
-        {
-            _mainMenuMediator = mainMenuMediator;
-        }
-        
+        private Sequence _buttonPressSequence;
+        private Tween _buttonRotateTween;
+        private Sequence _logoRaySequence;
+
+        private MainMenuMediator _mainMenuMediator;
+        private Sequence _paintSequence;
+        private Tween _rayTween;
+        private Sequence _starsSequence;
+
         protected override void OnEnable()
         {
             base.OnEnable();
-            
+
             button.onClick.AddListener(PlayButtonClick);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            
+
             button.onClick.RemoveListener(PlayButtonClick);
         }
-        
+
+        [Inject]
+        private void Construct(MainMenuMediator mainMenuMediator)
+        {
+            _mainMenuMediator = mainMenuMediator;
+        }
+
         protected override void StartAnimation()
         {
             StopAnimation();
@@ -97,10 +98,11 @@ namespace UI.Banners
 
         private void AnimateButton()
         {
-            _buttonPressSequence = Sequence.Create(cycles: -1);
+            _buttonPressSequence = Sequence.Create(-1);
 
             _buttonPressSequence.ChainDelay(2f);
-            _buttonPressSequence.Chain(Tween.Scale(button.transform, Vector3.one * minScale, pressDuration, Ease.OutBack));
+            _buttonPressSequence.Chain(Tween.Scale(button.transform, Vector3.one * minScale, pressDuration,
+                Ease.OutBack));
             _buttonPressSequence.Chain(Tween.Scale(button.transform, Vector3.one, pressDuration, Ease.OutBack));
             _buttonRotateTween = Tween.LocalRotation(
                 button.transform,
@@ -108,18 +110,18 @@ namespace UI.Banners
                 new Vector3(0, 0, -buttonAngle),
                 buttonRotationDuration,
                 Ease.InOutSine,
-                cycles: -1,
-                cycleMode:CycleMode.Yoyo
+                -1,
+                CycleMode.Yoyo
             );
         }
 
         private void AnimateStars()
         {
-            _starsSequence = Sequence.Create(cycles: -1, Sequence.SequenceCycleMode.Yoyo);
-            
+            _starsSequence = Sequence.Create(-1, Sequence.SequenceCycleMode.Yoyo);
+
             for (var i = 0; i < stars.Length; i++)
             {
-                var angle = UnityEngine.Random.Range(-starsAngle, starsAngle);
+                var angle = Random.Range(-starsAngle, starsAngle);
 
                 _starsSequence.Group(
                     Tween.LocalRotation(
@@ -132,7 +134,7 @@ namespace UI.Banners
                 );
             }
         }
-        
+
         private void AnimateRaysAndLogo()
         {
             _rayTween = Tween.LocalRotation(
@@ -141,12 +143,12 @@ namespace UI.Banners
                 new Vector3(0, 0, raysAngle),
                 raysRotationDuration,
                 Ease.InOutSine,
-                cycles: -1,
-                cycleMode:CycleMode.Yoyo
+                -1,
+                CycleMode.Yoyo
             );
-            
-            _logoRaySequence = Sequence.Create(cycles: -1, Sequence.SequenceCycleMode.Yoyo);
-            
+
+            _logoRaySequence = Sequence.Create(-1, Sequence.SequenceCycleMode.Yoyo);
+
             _logoRaySequence.Group(
                 Tween.Scale(
                     rays,
@@ -156,7 +158,7 @@ namespace UI.Banners
                     Ease.InOutSine
                 )
             );
-            
+
             _logoRaySequence.Group(
                 Tween.Scale(
                     logo,
@@ -171,17 +173,17 @@ namespace UI.Banners
         private void AnimatePaint()
         {
             mask.sizeDelta = new Vector2(1f, 1f);
-            
-            _paintSequence = Sequence.Create(cycles: -1, Sequence.SequenceCycleMode.Restart);
-            
+
+            _paintSequence = Sequence.Create(-1);
+
             _paintSequence.Group(Tween.LocalRotation(
                 brush,
                 Vector3.zero,
                 new Vector3(0, 0, brushAngle),
                 brushDuration,
                 Ease.InOutSine,
-                cycles: 2,
-                cycleMode: CycleMode.Yoyo
+                2,
+                CycleMode.Yoyo
             ));
 
             _paintSequence.Chain(Tween.UISizeDelta(
@@ -192,7 +194,7 @@ namespace UI.Banners
                     Ease.InOutSine
                 )
             );
-            
+
             _paintSequence.ChainDelay(3f);
         }
 

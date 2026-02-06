@@ -12,22 +12,17 @@ namespace UI.Premium
         [SerializeField] private Button continueButton;
         [SerializeField] private RectTransform roll;
         [SerializeField] private RectTransform mask;
-        [Header("Animation")]
-        [SerializeField] private float animationDuration = 0.5f;
-        [SerializeField] private Vector2 rollStartPosition = new (0f, 502f);
-        [SerializeField] private Vector2 rollEndPosition = new (0f, -2980);
+
+        [Header("Animation")] [SerializeField] private float animationDuration = 0.5f;
+
+        [SerializeField] private Vector2 rollStartPosition = new(0f, 502f);
+        [SerializeField] private Vector2 rollEndPosition = new(0f, -2980);
         [SerializeField] private float maskOnHeight = 3040f;
         [SerializeField] private float maskOffHeight = 1f;
 
         private Sequence _animationSequence;
 
         private MainMenuMediator _mainMenuMediator;
-
-        [Inject]
-        private void Construct(MainMenuMediator mainMenuMediator)
-        {
-            _mainMenuMediator = mainMenuMediator;
-        }
 
         protected override void OnEnable()
         {
@@ -41,6 +36,12 @@ namespace UI.Premium
             continueButton.onClick.RemoveListener(PlayButtonClick);
         }
 
+        [Inject]
+        private void Construct(MainMenuMediator mainMenuMediator)
+        {
+            _mainMenuMediator = mainMenuMediator;
+        }
+
         public override void Show()
         {
             base.Show();
@@ -51,19 +52,19 @@ namespace UI.Premium
         {
             AnimateClosing();
         }
-        
+
         protected override void Close()
         {
             base.Close();
-            
+
             PlayButtonClick();
         }
-        
+
         private void AnimateOpening()
         {
             if (_animationSequence.isAlive)
                 return;
-            
+
             roll.gameObject.SetActive(true);
             _animationSequence = Sequence.Create();
             _animationSequence.Group(
@@ -85,12 +86,12 @@ namespace UI.Premium
                 )
             );
         }
-        
+
         private void AnimateClosing()
         {
             if (_animationSequence.isAlive)
                 return;
-            
+
             roll.gameObject.SetActive(true);
             _animationSequence = Sequence.Create();
             _animationSequence.Group(

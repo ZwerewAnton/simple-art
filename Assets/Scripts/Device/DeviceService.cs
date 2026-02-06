@@ -4,12 +4,12 @@ namespace Device
 {
     public class DeviceService : IDeviceService
     {
-        public Device Device { get; }
-
         private DeviceService()
         {
             Device = GetDeviceType();
         }
+
+        public Device Device { get; }
 
         private static Device GetDeviceType()
         {

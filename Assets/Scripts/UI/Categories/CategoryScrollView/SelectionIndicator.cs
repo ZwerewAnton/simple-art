@@ -8,10 +8,10 @@ namespace UI.Categories.CategoryScrollView
         [SerializeField] private RectTransform rectTransform;
         [SerializeField] private RectTransform indicatorRectTransform;
         [SerializeField] private float indicatorTweenDuration = 0.4f;
-        
-        private Tween _indicatorTween;
-        private int _elementsCount;
         private float _elementLength;
+        private int _elementsCount;
+
+        private Tween _indicatorTween;
 
         public void Setup(float size, int elementsCount)
         {
@@ -24,7 +24,7 @@ namespace UI.Categories.CategoryScrollView
         {
             if (elementsIndex < 0 || elementsIndex >= _elementsCount)
                 return;
-            
+
             if (_indicatorTween.isAlive)
                 _indicatorTween.Stop();
 

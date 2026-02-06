@@ -21,7 +21,7 @@ namespace UI.Categories.CategoriesScrollView
         public override void SetData(int itemIndex, CategoriesItemModel model)
         {
             base.SetData(itemIndex, model);
-            
+
             scrollPresenter.UpdateModels(model.pictureItemModels);
             scrollPresenter.SetContentPosition(model.contentPosition);
         }
