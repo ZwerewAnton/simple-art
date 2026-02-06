@@ -43,8 +43,11 @@ namespace UI.Pictures
                     continue;
                 }
 
+                var cellModel = model[i];
+
                 cell.SetActive(true);
-                cell.SetImage(model[i].ImageUrl);
+                cell.SetBadge(cellModel.IsPremium);
+                cell.SetImage(cellModel.ImageUrl);
             }
         }
 

@@ -13,27 +13,31 @@ namespace Remote
         private readonly Dictionary<string, List<Action<Texture2D>>> _pendingCallbacks = new();
         private ILoader _loaderImplementation;
 
-        public void Load(string url, Action<Texture2D> onComplete)
+        public void Load(string url, Action<Texture2D, bool> onComplete)
         {
             if (string.IsNullOrEmpty(url))
             {
-                onComplete?.Invoke(null);
+                onComplete?.Invoke(null, true);
                 return;
             }
 
             if (_cache.TryGetValue(url, out var cached))
             {
-                onComplete?.Invoke(cached);
+                onComplete?.Invoke(cached, true);
                 return;
             }
 
             if (_pendingCallbacks.TryGetValue(url, out var callbacks))
             {
-                callbacks.Add(onComplete);
+                callbacks.Add(tex => onComplete?.Invoke(tex, false));
                 return;
             }
 
-            _pendingCallbacks[url] = new List<Action<Texture2D>> { onComplete };
+            _pendingCallbacks[url] = new List<Action<Texture2D>>
+            {
+                tex => onComplete?.Invoke(tex, false)
+            };
+
             LoadInternal(url).Forget();
         }
 

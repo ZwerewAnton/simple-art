@@ -6,7 +6,6 @@ namespace Remote
 {
     public interface ILoader
     {
-        public void Load(string url, Action<Texture2D> onComplete);
-        //public UniTask<Texture2D> Load(string url);
+        void Load(string url, Action<Texture2D, bool> onComplete);
     }
 }

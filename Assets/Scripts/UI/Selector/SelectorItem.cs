@@ -64,9 +64,6 @@ namespace UI.Selector
 
         public void SetActiveImmediately(bool active)
         {
-            if (IsActive == active)
-                return;
-            
             if (_sequence.isAlive)
                 _sequence.Stop();
             

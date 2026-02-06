@@ -29,11 +29,13 @@ namespace UI.Selector
         private void Start()
         {
             if (startElement < 0 && startElement >= items.Count)
+                return;
+            
+            for (var i = 0; i < items.Count; i++)
             {
-                for (var i = 0; i < items.Count; i++)
-                {
-                    _current.SetActiveImmediately(startElement == i);
-                }
+                items[i].SetActiveImmediately(startElement == i);
+                if (startElement == i)
+                    _current = items[i];
             }
         }
 
