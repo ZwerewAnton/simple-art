@@ -148,11 +148,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 8781693137058285518}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -531.9, y: 94.2}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -531.9, y: -118.80005}
   m_SizeDelta: {x: 177, y: 294}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2697841032458657076
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -279,6 +279,7 @@ GameObject:
   - component: {fileID: 7941638122937942516}
   - component: {fileID: 2105693456944024903}
   - component: {fileID: 8481005614471465078}
+  - component: {fileID: 1873160476072745036}
   m_Layer: 5
   m_Name: BannerItemView
   m_TagString: Untagged
@@ -299,10 +300,10 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6329817448220872716}
+  - {fileID: 5732007814987469407}
   - {fileID: 2211442848523460058}
   - {fileID: 8496369368255988114}
   - {fileID: 4941050884787774764}
-  - {fileID: 5732007814987469407}
   - {fileID: 9010750893515308773}
   - {fileID: 8215210896221893303}
   - {fileID: 3438348447132526406}
@@ -386,6 +387,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
+--- !u!114 &1873160476072745036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3413049443095568318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0881db4f3b034ff38cb9191c38e54609, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lights:
+  - {fileID: 1551015409286558838}
+  - {fileID: 7521288612532260896}
+  - {fileID: 4005568011965028452}
+  - {fileID: 1915737928418641444}
+  - {fileID: 2359934172562196849}
+  - {fileID: 2554697327774752343}
+  rays: {fileID: 5732007814987469407}
+  movingFrame: {fileID: 8496369368255988114}
+  simpleArtLogo: {fileID: 9010750893515308773}
+  lightScaleDelta: 0.08
+  lightDuration: 1.2
+  raysPulseScale: 0.1
+  raysPulseDuration: 2
+  raysAngle: 30
+  raysRotationDuration: 5
+  frameAngle: 2.5
+  frameDuration: 3
 --- !u!1 &4474089622301019835
 GameObject:
   m_ObjectHideFlags: 0
@@ -1073,7 +1104,7 @@ GameObject:
   - component: {fileID: 3594209082173426363}
   - component: {fileID: 2200845602973210632}
   m_Layer: 5
-  m_Name: Name
+  m_Name: Logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

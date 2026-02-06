@@ -55,7 +55,7 @@ namespace UI.Pictures
 
             _imageLoader.Load(url, (texture, fromCache) =>
             {
-                if (localRequestId != _requestId || _currentUrl != url)
+                if (localRequestId != _requestId || _currentUrl != url && !this)
                     return;
 
                 if (!gameObject.activeInHierarchy)

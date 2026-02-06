@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using Object = UnityEngine.Object;
+using System.Threading;
 
 namespace Remote
 {
@@ -11,7 +12,8 @@ namespace Remote
     {
         private readonly Dictionary<string, Texture2D> _cache = new();
         private readonly Dictionary<string, List<Action<Texture2D>>> _pendingCallbacks = new();
-        private ILoader _loaderImplementation;
+
+        private readonly CancellationTokenSource _cts = new();
 
         public void Load(string url, Action<Texture2D, bool> onComplete)
         {
@@ -38,17 +40,28 @@ namespace Remote
                 tex => onComplete?.Invoke(tex, false)
             };
 
-            LoadInternal(url).Forget();
+            LoadInternal(url, _cts.Token).Forget();
         }
 
-        private async UniTaskVoid LoadInternal(string url)
+        private async UniTaskVoid LoadInternal(string url, CancellationToken token)
         {
             using var request = UnityWebRequestTexture.GetTexture(url, false);
             request.timeout = 10;
-            
-            await request.SendWebRequest().ToUniTask();
+
+            try
+            {
+                await request
+                    .SendWebRequest()
+                    .ToUniTask(cancellationToken: token);
+            }
+            catch (OperationCanceledException)
+            {
+                _pendingCallbacks.Remove(url);
+                return;
+            }
 
             Texture2D tex = null;
+
             if (request.result == UnityWebRequest.Result.Success)
             {
                 tex = DownloadHandlerTexture.GetContent(request);
@@ -72,12 +85,17 @@ namespace Remote
         {
             foreach (var tex in _cache.Values)
                 Object.Destroy(tex);
+
             _cache.Clear();
         }
 
         public void Dispose()
         {
+            _cts.Cancel();
+            _cts.Dispose();
+
             ClearCache();
+            _pendingCallbacks.Clear();
         }
     }
 }
