@@ -68,6 +68,7 @@ namespace UI.Splash
         private void AnimateSplash()
         {
             _splashSequence = Sequence.Create();
+            _splashSequence.Group(Tween.Delay(0.5f));
 
             AnimateDot();
             AnimateFrame();
@@ -79,7 +80,7 @@ namespace UI.Splash
 
         private void AnimateDot()
         {
-            _splashSequence.Group(
+            _splashSequence.Chain(
                 Tween.Scale(
                     dot.rectTransform,
                     Vector3.one * 3f,

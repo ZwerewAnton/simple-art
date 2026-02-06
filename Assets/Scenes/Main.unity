@@ -4352,7 +4352,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bannerPanel: {fileID: 1642255497}
   viewsPanel: {fileID: 643867453}
-  phoneHeight: 721
   tabletHeight: 504.7
 --- !u!4 &1217411324
 Transform:
@@ -8270,7 +8269,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -110.99988
+      value: -111
       objectReference: {fileID: 0}
     - target: {fileID: 2116442307956005197, guid: 018754d2b3c0d344fadaa22792ba36bf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

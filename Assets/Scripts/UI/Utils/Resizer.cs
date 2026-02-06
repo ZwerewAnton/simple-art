@@ -11,7 +11,6 @@ namespace UI.Utils
         [SerializeField] private RectTransform viewsPanel;
         
         [Header("Values")]
-        [SerializeField] private float phoneHeight = 721f;
         [SerializeField] private float tabletHeight = 504.7f;
         
         private IDeviceService _deviceService;
