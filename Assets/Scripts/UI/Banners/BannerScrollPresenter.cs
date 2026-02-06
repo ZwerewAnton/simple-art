@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Device;
 using UI.Common.ScrollView;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Zenject;
 
 namespace UI.Banners
 {
@@ -16,7 +18,8 @@ namespace UI.Banners
         [SerializeField] private HorizontalLayoutGroup layoutGroup;
 
         [Header("Items")]
-        [SerializeField] private List<GameObject> bannerPrefabs;
+        [SerializeField] private List<GameObject> phoneBannerPrefabs;
+        [SerializeField] private List<GameObject> tabletBannerPrefabs;
 
         [Header("Settings")]
         [SerializeField] private bool snap;
@@ -26,7 +29,6 @@ namespace UI.Banners
         [Header("Auto Scroll")]
         [SerializeField] private bool autoScroll = true;
         [SerializeField] private float autoScrollDelay = 5f;
-
 
         public event Action<int> FocusItemChanged;
         public event Action Initialized;
@@ -49,6 +51,14 @@ namespace UI.Banners
         protected bool ShouldSnap;
         private float LastDragDirection;
         private float _autoScrollTimer;
+        
+        private IDeviceService _deviceService;
+
+        [Inject]
+        private void Construct(IDeviceService deviceService)
+        {
+            _deviceService = deviceService;
+        }
         
         protected virtual void OnEnable()
         {
@@ -275,9 +285,10 @@ namespace UI.Banners
 
         private void SpawnBanners()
         {
-            for (var i = 0; i < bannerPrefabs.Count; i++)
+            var prefabs = _deviceService.Device == Device.Device.Phone ? phoneBannerPrefabs : tabletBannerPrefabs;
+            foreach (var t in prefabs)
             {
-                var go = Instantiate(bannerPrefabs[i], content);
+                var go = Instantiate(t, content);
                 var itemRect = go.GetComponent<RectTransform>();
                 _items.Add(itemRect);
             }
