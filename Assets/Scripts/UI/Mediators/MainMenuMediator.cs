@@ -6,6 +6,7 @@ using UI.Banners.Dots;
 using UI.Categories.CategoriesScrollView;
 using UI.Categories.CategoryScrollView;
 using UI.Premium;
+using UI.Splash;
 using UnityEngine;
 using Zenject;
 
@@ -13,6 +14,7 @@ namespace UI.Mediators
 {
     public class MainMenuMediator : MonoBehaviour
     {
+        [SerializeField] private SplashScreen splashScreen;
         [SerializeField] private CategoriesScrollPresenter categoriesScrollPresenter;
         [SerializeField] private CategoryScrollPresenter categoryScrollPresenter;
         [SerializeField] private SelectionIndicator selectionIndicator;
@@ -26,6 +28,7 @@ namespace UI.Mediators
 
         private void OnEnable()
         {
+            splashScreen.SplashCompleted += OnSplashCompleted;
             categoryScrollPresenter.Initialized += OnCategoryScrollInitialized;
             categoriesScrollPresenter.CenteredViewChanged += OnCategoriesScrollCenteredItemChanged;
             categoryScrollPresenter.ItemClicked += OnCategoryItemClicked;
@@ -35,6 +38,8 @@ namespace UI.Mediators
 
         private void OnDisable()
         {
+            splashScreen.SplashCompleted -= OnSplashCompleted;
+            categoryScrollPresenter.Initialized -= OnCategoryScrollInitialized;
             categoriesScrollPresenter.CenteredViewChanged -= OnCategoriesScrollCenteredItemChanged;
             categoryScrollPresenter.ItemClicked -= OnCategoryItemClicked;
             bannerScrollPresenter.Initialized -= OnBannerScrollInitialized;
@@ -101,6 +106,11 @@ namespace UI.Mediators
         private void OnBannerFocusItemChanged(int index)
         {
             dotPresenter.SetDotActive(index);
+        }
+
+        private void OnSplashCompleted()
+        {
+            bannerScrollPresenter.autoScroll = true;
         }
     }
 }

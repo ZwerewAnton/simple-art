@@ -1,6 +1,9 @@
+using System;
 using PrimeTween;
+using UI.Mediators;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace UI.Splash
 {
@@ -14,19 +17,22 @@ namespace UI.Splash
         [SerializeField] private Vector2[] rightHeartsPositions;
         [SerializeField] private Image logo;
         [SerializeField] private RectTransform tagsMask;
-        
-        [Header("CloseAnimation")]
-        [SerializeField] private RectTransform roll;
         [SerializeField] private RectTransform mask;
+
+        [Header("CloseAnimation")] [SerializeField]
+        private RectTransform roll;
         
-        private Sequence _splashSequence;
+        public event Action SplashCompleted;
+        
+        private readonly Color _offColor = new(1, 1, 1, 0);
+        private readonly Vector2 _tagsMaskOffSizeDelta = new(1f, 137f);
+        private readonly Vector2 _tagsMaskOnSizeDelta = new(632f, 137f);
+        private Sequence _closingSequence;
         private Sequence _leftHearthSequence;
         private Sequence _rightHearthSequence;
-        private Sequence _closingSequence;
-        private readonly Color _offColor = new Color(1, 1, 1,  0);
-        private readonly Vector2 _tagsMaskOffSizeDelta = new Vector2(1f, 137f);
-        private readonly Vector2 _tagsMaskOnSizeDelta = new Vector2(632f, 137f);
 
+        private Sequence _splashSequence;
+        
         private void OnEnable()
         {
             ResetVisual();
@@ -51,14 +57,8 @@ namespace UI.Splash
             frame.color = _offColor;
             logo.color = _offColor;
             tagsMask.sizeDelta = _tagsMaskOffSizeDelta;
-            foreach (var leftHeart in leftHearts)
-            {
-                leftHeart.color = _offColor;
-            }
-            foreach (var rightHeart in rightHearts)
-            {
-                rightHeart.color = _offColor;
-            }
+            foreach (var leftHeart in leftHearts) leftHeart.color = _offColor;
+            foreach (var rightHeart in rightHearts) rightHeart.color = _offColor;
 
             roll.anchoredPosition = new Vector2(0, -2980f);
             roll.gameObject.SetActive(false);
@@ -75,7 +75,11 @@ namespace UI.Splash
             AnimateLogo();
 
             _splashSequence.ChainDelay(2f);
-            _splashSequence.OnComplete(AnimateClosing);
+            _splashSequence.OnComplete(() =>
+            {
+                SplashCompleted?.Invoke();
+                AnimateClosing();
+            });
         }
 
         private void AnimateDot()
@@ -195,7 +199,7 @@ namespace UI.Splash
                 );
             }
         }
-        
+
         private void AnimateLogo()
         {
             _splashSequence.Chain(

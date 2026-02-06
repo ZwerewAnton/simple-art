@@ -3470,7 +3470,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &998286206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3583,8 +3583,8 @@ MonoBehaviour:
   - {x: 478.3, y: -34}
   logo: {fileID: 593321624}
   tagsMask: {fileID: 1613088091}
-  roll: {fileID: 687568497}
   mask: {fileID: 1906133109}
+  roll: {fileID: 687568497}
 --- !u!1 &1016561146
 GameObject:
   m_ObjectHideFlags: 0
@@ -6744,7 +6744,7 @@ MonoBehaviour:
   snap: 1
   snapSpeed: 10
   snapThreshold: 0.5
-  autoScroll: 1
+  autoScroll: 0
   autoScrollDelay: 5
 --- !u!114 &1751640850
 MonoBehaviour:
@@ -7879,6 +7879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4911a85206942c895fd45d9cb12c678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  splashScreen: {fileID: 998286210}
   categoriesScrollPresenter: {fileID: 9212402506307289354}
   categoryScrollPresenter: {fileID: 437207440}
   selectionIndicator: {fileID: 5911251583906811762}

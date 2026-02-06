@@ -11,78 +11,51 @@ namespace UI.Banners
 {
     public class BannerScrollPresenter : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     {
-        [Header("References")]
-        [SerializeField] private ScrollRect scrollRect;
+        [Header("References")] [SerializeField]
+        private ScrollRect scrollRect;
+
         [SerializeField] private RectTransform viewport;
         [SerializeField] private RectTransform content;
         [SerializeField] private HorizontalLayoutGroup layoutGroup;
 
-        [Header("Items")]
-        [SerializeField] private List<GameObject> phoneBannerPrefabs;
+        [Header("Items")] [SerializeField] private List<GameObject> phoneBannerPrefabs;
+
         [SerializeField] private List<GameObject> tabletBannerPrefabs;
 
-        [Header("Settings")]
-        [SerializeField] private bool snap;
+        [Header("Settings")] [SerializeField] private bool snap;
+
         [SerializeField] private float snapSpeed = 10f;
         [SerializeField] protected float snapThreshold = 0.5f;
-        
+
         [Header("Auto Scroll")]
-        [SerializeField] private bool autoScroll = true;
+        public bool autoScroll = true;
+
         [SerializeField] private float autoScrollDelay = 5f;
 
-        public event Action<int> FocusItemChanged;
-        public event Action Initialized;
+        private readonly List<RectTransform> _items = new();
+        private float _autoScrollTimer;
+        private float _center;
+
+        private IDeviceService _deviceService;
+        private DiContainer _diContainer;
+        private bool _dragging;
+
+        private float _itemSize;
+        private int _lastCenterBannerIndex;
+        private float _lastDragDirection;
+        private float _lastShiftX;
+
+        private int _nextIndex;
+        private int _prevIndex;
+        private bool _shouldSnap;
+
+        private TargetItemData _targetItemData;
         public int ItemsCount => _items.Count;
         public int FocusItemIndex { get; private set; }
 
-        private readonly List<RectTransform> _items = new();
-
-        private float _itemSize;
-        private float _center;
-        private bool _dragging = false;
-        private float _lastShiftX;
-        private int _lastCenterBannerIndex;
-        
-        private int _nextIndex;
-        private int _prevIndex;
-
-        private TargetItemData _targetItemData;
-        private bool _shouldSnap;
-        private float _lastDragDirection;
-        private float _autoScrollTimer;
-        
-        private IDeviceService _deviceService;
-        private DiContainer _diContainer;
-
-        [Inject]
-        private void Construct(IDeviceService deviceService, DiContainer diContainer)
-        {
-            _deviceService = deviceService;
-            _diContainer = diContainer;
-        }
-        
-        protected virtual void OnEnable()
-        {
-            if (scrollRect != null)
-                scrollRect.onValueChanged.AddListener(OnScrollChanged);
-        }
-        
         private void Start()
         {
             Initialize();
-        }
-
-        private void Initialize()
-        {
-            _itemSize = viewport.rect.width;
-            SpawnBanners();
-            LayoutItems();
-            
-            FocusItemIndex = 0;
-            _prevIndex = Prev(FocusItemIndex);
-            _nextIndex = Next(FocusItemIndex);
-            
-            Initialized?.Invoke();
         }
 
         private void Update()
@@ -104,7 +77,13 @@ namespace UI.Banners
             if (snap && _shouldSnap)
                 SmoothSnap();
         }
-        
+
+        protected virtual void OnEnable()
+        {
+            if (scrollRect != null)
+                scrollRect.onValueChanged.AddListener(OnScrollChanged);
+        }
+
         private void OnDisable()
         {
             if (scrollRect != null)
@@ -115,7 +94,7 @@ namespace UI.Banners
         {
             _dragging = true;
             _autoScrollTimer = 0f;
-            
+
             DisableSnap();
         }
 
@@ -123,7 +102,7 @@ namespace UI.Banners
         {
             _dragging = false;
             _autoScrollTimer = 0f;
-            
+
             if (snap)
             {
                 _lastDragDirection = Mathf.Sign(eventData.position.x - eventData.pressPosition.x);
@@ -131,7 +110,30 @@ namespace UI.Banners
                 EnableSnap();
             }
         }
-        
+
+        public event Action<int> FocusItemChanged;
+        public event Action Initialized;
+
+        [Inject]
+        private void Construct(IDeviceService deviceService, DiContainer diContainer)
+        {
+            _deviceService = deviceService;
+            _diContainer = diContainer;
+        }
+
+        private void Initialize()
+        {
+            _itemSize = viewport.rect.width;
+            SpawnBanners();
+            LayoutItems();
+
+            FocusItemIndex = 0;
+            _prevIndex = Prev(FocusItemIndex);
+            _nextIndex = Next(FocusItemIndex);
+
+            Initialized?.Invoke();
+        }
+
         private void MoveCenter()
         {
             content.anchoredPosition = Vector2.zero;
@@ -140,7 +142,7 @@ namespace UI.Banners
 
             LayoutItems();
         }
-        
+
         private void LayoutItems()
         {
             var count = _items.Count;
@@ -155,7 +157,7 @@ namespace UI.Banners
 
             content.anchoredPosition = Vector2.zero;
         }
-        
+
         private static int GetRelativeIndex(int itemIndex, int centerIndex, int count)
         {
             var diff = itemIndex - centerIndex;
@@ -167,26 +169,26 @@ namespace UI.Banners
 
             return diff;
         }
-        
+
         private void OnScrollChanged(Vector2 _)
         {
             var currentX = content.anchoredPosition.x;
             var delta = currentX - _lastShiftX;
-            
+
             var threshold = _itemSize * 0.5f;
 
             if (delta <= -threshold)
             {
                 var centerItemPosition = _items[_nextIndex].anchoredPosition.x;
-                var newBannerPosition =  _itemSize + centerItemPosition;
+                var newBannerPosition = _itemSize + centerItemPosition;
                 _items[_prevIndex].anchoredPosition = new Vector2(newBannerPosition, 0f);
-                
+
                 FocusItemIndex = _nextIndex;
                 _nextIndex = Next(FocusItemIndex);
                 _prevIndex = Prev(FocusItemIndex);
-                
+
                 _lastShiftX -= _itemSize;
-                
+
                 FocusItemChanged?.Invoke(FocusItemIndex);
             }
             else if (delta >= threshold)
@@ -199,9 +201,9 @@ namespace UI.Banners
                 FocusItemIndex = _prevIndex;
                 _nextIndex = Next(FocusItemIndex);
                 _prevIndex = Prev(FocusItemIndex);
-                
+
                 _lastShiftX += _itemSize;
-                
+
                 FocusItemChanged?.Invoke(FocusItemIndex);
             }
         }
@@ -210,12 +212,12 @@ namespace UI.Banners
         {
             return (index - 1 + _items.Count) % _items.Count;
         }
-        
+
         private int Next(int index)
         {
             return (index + 1) % _items.Count;
         }
-        
+
         private void AutoScrollNext()
         {
             _lastDragDirection = -1f;
@@ -227,7 +229,7 @@ namespace UI.Banners
 
             EnableSnap();
         }
-        
+
         protected virtual void SmoothSnap()
         {
             var currentX = content.anchoredPosition.x;
@@ -244,7 +246,7 @@ namespace UI.Banners
                 MoveCenter();
             }
         }
-        
+
         private TargetItemData FindNearestItemData()
         {
             var center = -content.anchoredPosition.x;
@@ -294,7 +296,7 @@ namespace UI.Banners
                 _items.Add(itemRect);
             }
         }
-        
+
         private void DisableSnap()
         {
             _shouldSnap = false;

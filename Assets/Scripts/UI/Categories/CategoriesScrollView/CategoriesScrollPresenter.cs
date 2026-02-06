@@ -8,11 +8,10 @@ namespace UI.Categories.CategoriesScrollView
 {
     public class CategoriesScrollPresenter : ScrollPresenterBase<CategoriesItemModel, CategoriesItemView>
     {
-        public event Action<int> CenteredViewChanged;
-        
         private DiContainer _diContainer;
         private int _lastCenteredItemIndex;
-        
+        public event Action<int> CenteredViewChanged;
+
         [Inject]
         public void Construct(DiContainer diContainer)
         {
@@ -44,16 +43,13 @@ namespace UI.Categories.CategoriesScrollView
         {
             return GetViewportSize();
         }
-        
+
         public override void OnBeginDrag(PointerEventData eventData)
         {
             base.OnBeginDrag(eventData);
 
             SaveViewsPosition();
-            foreach (var itemView in ActiveItems)
-            {
-                itemView.IsRefreshed = false;
-            }
+            foreach (var itemView in ActiveItems) itemView.IsRefreshed = false;
         }
 
         public override void OnEndDrag(PointerEventData eventData)
@@ -63,7 +59,7 @@ namespace UI.Categories.CategoriesScrollView
             SaveViewsPosition();
         }
 
-        
+
         protected override void OnSnapEnded()
         {
             SaveViewsPosition();
@@ -80,7 +76,7 @@ namespace UI.Categories.CategoriesScrollView
         {
             if (index < 0 && index >= Models.Count)
                 return;
-            
+
             EnableSnap();
             TargetItemData = new TargetItemData(GetAnchoredPosition(index), index);
             SaveViewsPosition();
@@ -91,7 +87,7 @@ namespace UI.Categories.CategoriesScrollView
             var center = -content.anchoredPosition.x;
             var closestDist = float.MaxValue;
             var closestModelIndex = 0;
-            
+
             foreach (var item in ActiveItems)
             {
                 var itemCenter = item.RectTransform.anchoredPosition.x - BorderSpacing;
@@ -116,14 +112,14 @@ namespace UI.Categories.CategoriesScrollView
         {
             foreach (var item in ActiveItems)
             {
-                if (!item.Active) 
+                if (!item.Active)
                     continue;
-                
+
                 var index = item.ItemIndex;
-                
+
                 if (index < 0)
                     continue;
-                
+
                 Models[index].contentPosition = item.GetContentPosition();
             }
         }

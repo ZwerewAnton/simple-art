@@ -1,4 +1,3 @@
-using System;
 using Device;
 using UnityEngine;
 using Zenject;
@@ -9,11 +8,15 @@ namespace UI.Utils
     {
         [SerializeField] private RectTransform bannerPanel;
         [SerializeField] private RectTransform viewsPanel;
-        
-        [Header("Values")]
-        [SerializeField] private float tabletHeight = 504.7f;
-        
+
+        [Header("Values")] [SerializeField] private float tabletHeight = 504.7f;
+
         private IDeviceService _deviceService;
+
+        private void Awake()
+        {
+            SetPanelsSize();
+        }
 
         [Inject]
         private void Construct(IDeviceService deviceService)
@@ -21,16 +24,11 @@ namespace UI.Utils
             _deviceService = deviceService;
         }
 
-        private void Awake()
-        {
-            SetPanelsSize();
-        }
-
         private void SetPanelsSize()
         {
             if (_deviceService.Device == Device.Device.Phone)
                 return;
-            
+
             bannerPanel.sizeDelta = new Vector2(bannerPanel.sizeDelta.x, tabletHeight);
             viewsPanel.offsetMax = new Vector2(viewsPanel.offsetMax.x, -tabletHeight);
         }
