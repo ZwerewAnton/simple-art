@@ -1,9 +1,12 @@
-using UnityEngine.Device;
+using UnityEngine;
+using Screen = UnityEngine.Device.Screen;
 
 namespace Device
 {
     public class DeviceService : IDeviceService
     {
+        private const float TabletThreshold = 0.59f;
+        
         private DeviceService()
         {
             Device = GetDeviceType();
@@ -13,7 +16,14 @@ namespace Device
 
         private static Device GetDeviceType()
         {
-            return Screen.width / (1f * Screen.height) >= 0.65f ? Device.Tablet : Device.Phone;
+            float width  = Screen.width;
+            float height = Screen.height;
+            
+            var aspect = Mathf.Min(width, height) / Mathf.Max(width, height);
+            
+            return aspect >= TabletThreshold
+                ? Device.Tablet
+                : Device.Phone;
         }
     }
 }
